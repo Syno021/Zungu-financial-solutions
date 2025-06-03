@@ -1,0 +1,183 @@
+  <ion-header [translucent]="true">
+    <ion-toolbar color="primary">
+      <ion-title size="large">Create Account</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="registration-container">
+    <div class="welcome-section">
+      <ion-icon name="person-add-outline" class="welcome-icon"></ion-icon>
+      <h2>Join Us Today</h2>
+      <p>Create your account to get started</p>
+    </div>
+
+    <ion-card class="registration-card">
+      <ion-card-header>
+        <ion-card-title>Personal Information</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <ion-list lines="none">
+          <!-- Name Row -->
+          <div class="input-row">
+            <ion-item class="input-item">
+              <ion-input 
+                label="First Name" 
+                labelPlacement="floating"
+                [(ngModel)]="name"
+                placeholder="Enter your first name"
+                fill="outline">
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+              </ion-input>
+            </ion-item>
+            
+            <ion-item class="input-item">
+              <ion-input 
+                label="Last Name" 
+                labelPlacement="floating"
+                [(ngModel)]="surname"
+                placeholder="Enter your last name"
+                fill="outline">
+              </ion-input>
+            </ion-item>
+          </div>
+
+          <!-- Gender -->
+          <ion-item class="input-item">
+            <ion-select 
+              label="Gender" 
+              labelPlacement="floating"
+              [(ngModel)]="gender"
+              placeholder="Select your gender"
+              fill="outline">
+              <ion-icon name="male-female-outline" slot="start"></ion-icon>
+              <ion-select-option value="male">Male</ion-select-option>
+              <ion-select-option value="female">Female</ion-select-option>
+              <ion-select-option value="other">Other</ion-select-option>
+              <ion-select-option value="prefer-not-to-say">Prefer not to say</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- ID Number -->
+          <ion-item class="input-item">
+            <ion-input 
+              label="ID Number" 
+              labelPlacement="floating"
+              [(ngModel)]="idNumber"
+              placeholder="Enter your ID number"
+              fill="outline">
+              <ion-icon name="card-outline" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <!-- Contact Information -->
+          <div class="section-divider">
+            <h3>Contact Information</h3>
+          </div>
+
+          <ion-item class="input-item">
+            <ion-input 
+              label="Email" 
+              type="email"
+              labelPlacement="floating"
+              [(ngModel)]="email"
+              placeholder="Enter your email address"
+              fill="outline">
+              <ion-icon name="mail-outline" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="input-item">
+            <ion-input 
+              label="Phone Number" 
+              type="tel"
+              labelPlacement="floating"
+              [(ngModel)]="phoneNumber"
+              placeholder="Enter your phone number"
+              fill="outline">
+              <ion-icon name="call-outline" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <!-- Banking Information -->
+          <div class="section-divider">
+            <h3>Banking Information</h3>
+          </div>
+
+          <ion-item class="input-item">
+            <ion-input 
+              label="Bank Account Number" 
+              labelPlacement="floating"
+              [(ngModel)]="bankAccount"
+              placeholder="Enter your bank account number"
+              fill="outline">
+              <ion-icon name="card-outline" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <!-- Security -->
+          <div class="section-divider">
+            <h3>Security</h3>
+          </div>
+
+          <ion-item class="input-item">
+            <ion-input 
+              label="Password" 
+              type="password"
+              labelPlacement="floating"
+              [(ngModel)]="password"
+              placeholder="Create a strong password"
+              fill="outline">
+              <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="input-item">
+            <ion-input 
+              label="Confirm Password" 
+              type="password"
+              labelPlacement="floating"
+              [(ngModel)]="confirmPassword"
+              placeholder="Confirm your password"
+              fill="outline">
+              <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+            </ion-input>
+          </ion-item>
+
+          <!-- Password validation message -->
+          <ion-item lines="none" *ngIf="password && confirmPassword && password !== confirmPassword" class="error-message">
+            <ion-text color="danger">
+              <p>Passwords do not match</p>
+            </ion-text>
+          </ion-item>
+
+          <!-- Terms and Conditions -->
+          <ion-item lines="none" class="terms-item">
+            <ion-checkbox [(ngModel)]="acceptTerms" slot="start"></ion-checkbox>
+            <ion-label class="terms-label">
+              I agree to the <a href="#" class="terms-link">Terms and Conditions</a>
+            </ion-label>
+          </ion-item>
+
+          <!-- Register Button -->
+          <ion-button 
+            expand="block" 
+            size="large"
+            color="primary"
+            class="register-button"
+            [disabled]="!isFormValid()"
+            (click)="registerUser()">
+            <ion-icon name="person-add-outline" slot="start"></ion-icon>
+            Create Account
+          </ion-button>
+
+          <!-- Login Link -->
+          <div class="login-link-container">
+            <p>Already have an account? <a href="/login" class="login-link">Sign In</a></p>
+          </div>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

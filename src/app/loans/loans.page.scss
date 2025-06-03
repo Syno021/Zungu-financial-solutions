@@ -1,0 +1,193 @@
+.loan-info-container {
+  padding: 16px;
+  
+  ion-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    ion-card-header {
+      padding-bottom: 8px;
+      
+      ion-card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+      
+      ion-card-subtitle {
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+      }
+    }
+    
+    ion-card-content {
+      padding-top: 8px;
+      
+      p {
+        margin: 0;
+        line-height: 1.5;
+        color: var(--ion-color-dark);
+      }
+      
+      ion-list {
+        background: transparent;
+        
+        ion-item {
+          --padding-start: 0;
+          --inner-padding-end: 0;
+          background: transparent;
+          
+          ion-label {
+            h3 {
+              font-size: 1rem;
+              font-weight: 500;
+              color: var(--ion-color-dark);
+              margin-bottom: 4px;
+            }
+            
+            p {
+              font-size: 0.9rem;
+              color: var(--ion-color-primary);
+              font-weight: 500;
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.apply-button-container {
+  padding: 16px;
+  
+  ion-button {
+    height: 56px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    
+    ion-icon {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+// Modal styles
+ion-modal {
+  ion-header {
+    ion-toolbar {
+      --background: var(--ion-color-primary);
+      --color: white;
+      
+      ion-title {
+        font-weight: 600;
+      }
+      
+      ion-button {
+        --color: white;
+      }
+    }
+  }
+  
+  ion-content {
+    --padding-top: 16px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-bottom: 16px;
+    
+    form {
+      ion-list {
+        background: transparent;
+        
+        ion-item {
+          --background: transparent;
+          --border-width: 0 0 1px 0;
+          --border-color: var(--ion-color-light);
+          margin-bottom: 8px;
+          
+          ion-input, ion-select, ion-textarea {
+            --padding-start: 0;
+          }
+          
+          ion-label {
+            font-weight: 500;
+            color: var(--ion-color-dark);
+          }
+        }
+      }
+      
+      ion-card {
+        margin-top: 16px;
+        border-radius: 12px;
+        background: var(--ion-color-light);
+        
+        ion-card-header {
+          padding-bottom: 8px;
+        }
+        
+        ion-card-content {
+          ion-item {
+            --background: transparent;
+            --border-width: 0;
+            
+            ion-label {
+              h3 {
+                color: var(--ion-color-primary);
+                font-weight: 600;
+              }
+              
+              p {
+                color: var(--ion-color-dark);
+                font-weight: 500;
+                font-size: 1.1rem;
+              }
+            }
+          }
+        }
+      }
+      
+      .ion-padding {
+        padding-top: 24px;
+        
+        ion-button {
+          height: 48px;
+          font-weight: 600;
+          border-radius: 12px;
+          
+          &[disabled] {
+            opacity: 0.6;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .loan-info-container {
+    padding: 12px;
+    
+    ion-card {
+      margin-bottom: 12px;
+    }
+  }
+  
+  .apply-button-container {
+    padding: 12px;
+  }
+}
+
+// Requirements section styling
+ion-card ion-list ion-item {
+  ion-icon[name="checkmark-circle"] {
+    font-size: 1.2rem;
+    margin-right: 8px;
+  }
+  
+  ion-label {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}

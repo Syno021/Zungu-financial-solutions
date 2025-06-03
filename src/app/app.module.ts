@@ -20,11 +20,9 @@ import { FormsModule } from '@angular/forms';
 
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { HttpClientModule } from '@angular/common/http';
-import { ICD10SelectionModalComponent } from './shared/components/icd10-selection-modal/icd10-selection-modal.component';
-
 
 @NgModule({
-  declarations: [AppComponent, ICD10SelectionModalComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),
