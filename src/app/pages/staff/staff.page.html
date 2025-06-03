@@ -1,0 +1,140 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Staff Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Staff Dashboard</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Loading your data...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- Appointments Section -->
+    <ion-card>
+      <ion-card-header (click)="toggleAppointments()" class="dropdown-header">
+        <ion-card-title>
+          Appointments
+          <ion-icon name="{{ showAppointments ? 'chevron-up' : 'chevron-down' }}" slot="end"></ion-icon>
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content *ngIf="showAppointments">
+        <div *ngIf="appointments.length === 0" class="no-data-message">
+          <p>No appointments found.</p>
+        </div>
+        
+        <ion-list *ngIf="appointments.length > 0">
+          <ion-item *ngFor="let appointment of appointments">
+            <ion-label>
+              <h2>{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</h2>
+              <p>Date: {{ appointment.dateTime }}</p>
+              <p>Status: <ion-badge color="{{ 
+                appointment.status === 'SCHEDULED' ? 'primary' : 
+                appointment.status === 'CONFIRMED' ? 'success' : 
+                appointment.status === 'IN_PROGRESS' ? 'warning' : 
+                appointment.status === 'COMPLETED' ? 'success' : 
+                appointment.status === 'CANCELLED' ? 'danger' : 
+                appointment.status === 'NO_SHOW' ? 'medium' : 'primary' 
+              }}">{{ appointment.status }}</ion-badge></p>
+            </ion-label>
+            <ion-button slot="end" fill="clear" (click)="updateAppointmentStatus(appointment)">
+              <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Prescriptions Section -->
+    <ion-card>
+      <ion-card-header (click)="togglePrescriptions()" class="dropdown-header">
+        <ion-card-title>
+          Prescriptions
+          <ion-icon name="{{ showPrescriptions ? 'chevron-up' : 'chevron-down' }}" slot="end"></ion-icon>
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content *ngIf="showPrescriptions">
+        <div *ngIf="prescriptions.length === 0" class="no-data-message">
+          <p>No prescriptions found.</p>
+        </div>
+        
+        <ion-list *ngIf="prescriptions.length > 0">
+          <ion-item *ngFor="let prescription of prescriptions">
+            <ion-label>
+              <h2>{{ prescription.patientName }}</h2>
+              <p>Medication: {{ prescription.medication }}</p>
+              <p>Dosage: {{ prescription.dosage }}</p>
+              <p>Date: {{ prescription.issuedAt }}</p>
+              <p>Instructions: {{ prescription.instructions }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Lab Results Section -->
+    <ion-card>
+      <ion-card-header (click)="toggleLabResults()" class="dropdown-header">
+        <ion-card-title>
+          Lab Results
+          <ion-icon name="{{ showLabResults ? 'chevron-up' : 'chevron-down' }}" slot="end"></ion-icon>
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content *ngIf="showLabResults">
+        <div *ngIf="labResults.length === 0" class="no-data-message">
+          <p>No lab results found.</p>
+        </div>
+        
+        <ion-list *ngIf="labResults.length > 0">
+          <ion-item *ngFor="let labResult of labResults">
+            <ion-label>
+              <h2>{{ labResult.patientName }}</h2>
+              <p>Test: {{ labResult.testName }}</p>
+              <p>Result: {{ labResult.result }}</p>
+              <p>Reference Range: {{ labResult.referenceRange }}</p>
+              <p>Date: {{ labResult.issuedAt }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Radiology Results Section -->
+    <ion-card>
+      <ion-card-header (click)="toggleRadiologyResults()" class="dropdown-header">
+        <ion-card-title>
+          Radiology Results
+          <ion-icon name="{{ showRadiologyResults ? 'chevron-up' : 'chevron-down' }}" slot="end"></ion-icon>
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content *ngIf="showRadiologyResults">
+        <div *ngIf="radiologyResults.length === 0" class="no-data-message">
+          <p>No radiology results found.</p>
+        </div>
+        
+        <ion-list *ngIf="radiologyResults.length > 0">
+          <ion-item *ngFor="let radiologyResult of radiologyResults">
+            <ion-label>
+              <h2>{{ radiologyResult.patientName }}</h2>
+              <p>Procedure: {{ radiologyResult.procedureName }}</p>
+              <p>Findings: {{ radiologyResult.findings }}</p>
+              <p>Impression: {{ radiologyResult.impression }}</p>
+              <p>Date: {{ radiologyResult.issuedAt }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

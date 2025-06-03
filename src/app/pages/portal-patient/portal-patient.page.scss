@@ -1,0 +1,126 @@
+
+  
+  /* Enhanced card styling */
+  ion-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  
+  ion-card-header {
+    border-bottom: 1px solid rgba(129, 199, 132, 0.3);
+  }
+  
+  ion-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--ion-color-primary);
+  }
+  
+  ion-card-subtitle {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ion-color-secondary);
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Button styling */
+  ion-button {
+    --border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+  }
+  
+  .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .action-buttons {
+    margin-top: 16px;
+  }
+  
+  /* List item styling */
+  ion-item {
+    --padding-start: 8px;
+    --inner-padding-end: 8px;
+    margin-bottom: 4px;
+  }
+  
+  ion-item ion-icon {
+    margin-right: 8px;
+  }
+  
+  ion-item h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    margin-bottom: 4px;
+  }
+  
+  ion-item p {
+    font-size: 0.95rem;
+    color: var(--ion-color-medium);
+  }
+  
+  /* Accordion styling */
+  ion-accordion {
+    margin-bottom: 8px;
+  }
+  
+  ion-accordion ion-item {
+    --background: rgba(129, 199, 132, 0.1);
+    border-radius: 8px;
+  }
+  
+  /* Footer tabs */
+  ion-tab-bar {
+    --background: white;
+    border-top: 1px solid rgba(129, 199, 132, 0.3);
+    height: 60px;
+  }
+  
+  ion-tab-button {
+    --color: var(--ion-color-medium);
+    --color-selected: var(--ion-color-primary);
+  }
+  
+  /* Quick action segment */
+  .quick-actions {
+    margin-bottom: 16px;
+  }
+  
+  ion-segment {
+    --background: transparent;
+  }
+  
+  ion-segment-button {
+    --indicator-color: var(--ion-color-primary);
+    --color-checked: var(--ion-color-primary);
+    --color: var(--ion-color-medium);
+    min-width: 80px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    ion-card {
+      margin: 12px 0;
+    }
+    
+    .button-row {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    ion-content {
+      --padding-start: 24px;
+      --padding-end: 24px;
+    }
+  }

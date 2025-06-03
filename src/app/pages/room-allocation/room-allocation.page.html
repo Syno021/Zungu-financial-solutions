@@ -1,0 +1,62 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Room Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="fade-in">
+  <ion-card class="room-card">
+    <ion-card-header>
+      <ion-card-title>Add Room</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Room ID</ion-label>
+        <ion-input [(ngModel)]="newRoom.roomId"></ion-input>
+      </ion-item>
+
+      <ion-item>
+  <ion-label position="floating">Room Type</ion-label>
+  <ion-select [(ngModel)]="newRoom.roomType">
+    <ion-select-option *ngFor="let type of roomTypes" [value]="type">
+      {{type.replace('_', ' ')}}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Room Number</ion-label>
+        <ion-input [(ngModel)]="newRoom.roomNumber"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Location</ion-label>
+        <ion-input [(ngModel)]="newRoom.location"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Total Beds</ion-label>
+        <ion-input type="number" [(ngModel)]="newRoom.totalBeds"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Total Seats</ion-label>
+        <ion-input type="number" [(ngModel)]="newRoom.totalSeats"></ion-input>
+      </ion-item>
+
+      <ion-button expand="full" class="success" (click)="addRoom()">Add Room</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list>
+    <ion-item *ngFor="let room of rooms" class="room-item">
+      <ion-label>
+        <h2>
+          {{ room.roomNumber }} - {{ room.status }}
+        </h2>
+        <p>{{ room.location }}</p>
+      </ion-label>
+      <ion-button color="danger" (click)="deleteRoom(room.roomId)">Delete</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

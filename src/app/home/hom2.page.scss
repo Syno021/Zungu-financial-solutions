@@ -1,0 +1,126 @@
+/* Animation Enhancements */
+.healixir-slide-up {
+    animation: slideUp var(--healixir-transition-normal) var(--healixir-easing);
+  }
+  
+  .healixir-fade-in {
+    animation: fadeIn var(--healixir-transition-normal) var(--healixir-easing);
+    animation-fill-mode: both;
+  }
+  
+  /* Staggered animations for feature cards */
+  .features-section .feature-card:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  
+  .features-section .feature-card:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .features-section .feature-card:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  
+  /* Staggered animations for quick action cards */
+  .quick-actions .action-card:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  
+  .quick-actions .action-card:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  
+  .quick-actions .action-card:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  
+  .quick-actions .action-card:nth-child(4) {
+    animation-delay: 0.25s;
+  }
+  
+
+  /* Login Card Styles */
+.login-card-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Reset card styles */
+  .reset-instructions {
+    margin-bottom: 1.5rem;
+    color: var(--ion-text-color);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .back-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: transparent;
+    color: var(--ion-color-primary-base);
+    border: 1px solid var(--ion-color-primary-base);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .back-button:hover {
+    background-color: rgba(46, 125, 50, 0.05);
+  }
+  
+  .back-button ion-icon {
+    margin-right: 0.5rem;
+  }
+  
+  /* Spinner for loading state */
+  .button-spinner {
+    margin-right: 0.5rem;
+  }
+  
+  /* Active user type pill */
+  .user-type-pill {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .user-type-pill.active::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background-color: var(--ion-color-primary-tint);
+    border-radius: 3px;
+    animation: scaleIn 0.3s ease;
+  }
+  
+  @keyframes scaleIn {
+    from { transform: translateX(-50%) scaleX(0); }
+    to { transform: translateX(-50%) scaleX(1); }
+  }
+  
+  /* Disabled button styles */
+  .login-button:disabled {
+    background-color: #b0b0b0;
+    cursor: not-allowed;
+  }
+  
+

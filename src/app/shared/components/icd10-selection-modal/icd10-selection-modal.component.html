@@ -1,0 +1,81 @@
+<!-- icd10-selection-modal.component.html -->
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Select ICD-10 Code</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="selectCodes()">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="toggleViewMode()">
+        <ion-icon [name]="viewMode === 'list' ? 'grid-outline' : 'list-outline'"></ion-icon>
+      </ion-button>
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      (ionInput)="searchCodes()"
+      placeholder="Search by code or description"
+      animated>
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="selectedCategory" (ionChange)="searchCodes()">
+      <ion-segment-button *ngFor="let category of categories" [value]="category">
+        <ion-label>{{category | titlecase}}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div [ngClass]="{'grid-container': viewMode === 'grid'}">
+    <ng-container *ngIf="viewMode === 'list'">
+      <ion-list>
+        <ion-item *ngFor="let code of filteredCodes" button (click)="selectCode(code)" [class.selected]="isSelected(code)">
+          <ion-icon name="medical-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{code.code}}</h2>
+            <h3>{{code.shortDescription}}</h3>
+            <p>
+              <ion-badge color="tertiary">{{code.category}}</ion-badge>
+              <ion-badge color="secondary" *ngIf="code.subCategory">{{code.subCategory}}</ion-badge>
+            </p>
+          </ion-label>
+          <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+
+    <ng-container *ngIf="viewMode === 'grid'">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" *ngFor="let code of filteredCodes">
+            <ion-card (click)="selectCode(code)" button>
+              <ion-card-header>
+                <ion-card-subtitle>
+                  <ion-icon name="medical-outline" color="primary"></ion-icon>
+                  {{code.code}}
+                </ion-card-subtitle>
+                <ion-card-title>{{code.shortDescription}}</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-badge color="tertiary">{{code.category}}</ion-badge>
+                <ion-badge color="secondary" *ngIf="code.subCategory">{{code.subCategory}}</ion-badge>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ng-container>
+  </div>
+
+  <ion-infinite-scroll>
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

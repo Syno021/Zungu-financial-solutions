@@ -1,0 +1,94 @@
+<!-- patient-id-cards.page.html -->
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Patient Cards</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="downloadPDF()">
+        <ion-icon slot="icon-only" name="download"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="controls-container">
+    <div class="search-filters">
+      <ion-searchbar [(ngModel)]="searchId" placeholder="Search by ID" (ionChange)="filterPatients()" debounce="300"></ion-searchbar>
+      <ion-searchbar [(ngModel)]="searchName" placeholder="Search by Name" (ionChange)="filterPatients()" debounce="300"></ion-searchbar>
+    </div>
+    
+    <div class="selection-controls">
+      <ion-item class="checkAll" lines="none">
+        <ion-checkbox [(ngModel)]="selectAll" (ionChange)="toggleSelectAll()"></ion-checkbox>
+        <ion-text >Select All</ion-text>
+      </ion-item>
+      <ion-button fill="outline" (click)="downloadPDF()">
+        <ion-icon slot="start" name="download"></ion-icon>
+        Download Selected
+      </ion-button>
+    </div>
+  </div>
+
+  <div class="cards-container">
+    <div *ngFor="let patient of filteredPatients" class="id-card" [id]="'card-' + patient.id">
+      <div class="selection-checkbox">
+        <ion-checkbox [(ngModel)]="patient.selected"></ion-checkbox>
+      </div>
+      
+      <div class="card-header">
+        <div class="facility-branding">
+       
+          <div class="facility-info">
+            <h2>{{ currentFacilityName.name }}</h2>
+            <small>Authorized Medical Facility</small>
+          </div>
+        </div>
+        <!-- <div class="patient-id-display">
+          <ion-badge color="primary">{{ patient.idNumber }}</ion-badge>
+        </div> -->
+      </div>
+      
+      <div class="card-content">
+        <div class="patient-photo">
+          <div class="qr-container">
+            <img [src]="patient.qrData" alt="Patient QR Code" class="qr-code">
+          </div>
+        </div>
+        
+        <div class="patient-info">
+          <h1 class="patient-name">
+            <span>{{ patient.title }}</span>
+            {{ patient.name }} 
+            {{ patient.surname }}
+          
+          </h1>
+        
+          <div class="patient-details">
+            <div class="detail-item">
+              <ion-icon name="calendar" class="detail-icon"></ion-icon>
+              <span>{{ DateUtils.toDate(patient.dob) | date }}</span>
+            </div>
+            <div class="detail-item">
+              <ion-icon name="person" class="detail-icon"></ion-icon>
+              <span>{{ patient.gender }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="card-footer">
+        <div class="emergency-notice">
+          <ion-icon name="warning"></ion-icon>
+          <span>Scan Medical Identification Card</span>
+        </div>
+      </div>
+    </div>
+ 
+  </div>
+
+
+
+    
+             
+
+</ion-content>

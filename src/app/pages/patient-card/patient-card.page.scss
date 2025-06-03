@@ -1,0 +1,174 @@
+/* patient-id-cards.page.scss */
+.controls-container {
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,1);
+  
+    .search-filters {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+  
+    .selection-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+  }
+  
+ /* patient-id-cards.page.scss */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.8rem;
+    padding: 1rem;
+  }
+  
+  .id-card {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,1);
+    border-radius: 12px;
+  
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  .card-header {
+    border-bottom: 2px solid #25ac3b;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    .facility-branding {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      .facility-logo {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+      }
+      
+      h2 {
+        margin: 0;
+        color: #050608;
+        font-size: 1.25rem;
+      }
+      
+      small {
+        color: #666;
+        font-size: 0.75rem;
+      }
+    }
+  }
+  
+  .card-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+    align-items: center;
+    
+    .patient-photo {
+      .qr-code {
+        width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+        padding: 0.5rem;
+      }
+    }
+  }
+  
+  .patient-name {
+    color: #0c0d11;
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+    
+    span {
+      font-size: 1rem;
+      color: #666;
+    }
+  }
+  
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #444;
+    
+    ion-icon {
+      color: #0e0f1b;
+    }
+  }
+  
+  .card-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    
+    .emergency-notice {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #dc3545;
+      margin-left: 35px;
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  .selection-checkbox {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+  }
+
+
+
+ 
+  
+  .card-footer {
+    background: rgba(var(--emergency-red), 0.08);
+
+    border-radius: 12px;
+    
+    .emergency-notice {
+      display: flex;
+      align-items: center;
+    
+      color: var(--emergency-red);
+      
+      ion-icon {
+        font-size: 1.4rem;
+      }
+      
+      span {
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+    }
+  }
+  
+  @keyframes shine {
+    0% { transform: translate(-25%, -25%) rotate(30deg); }
+    100% { transform: translate(75%, 75%) rotate(30deg); }
+  }
+
+  ion-label {
+    color: #3880ff;
+  }
+  
+  ion-checkbox{
+    padding: 5px;
+  }

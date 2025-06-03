@@ -1,0 +1,35 @@
+.error {
+    font-size: 0.8rem;
+    margin-left: 1rem;
+    display: block;
+    padding-top: 0.5rem;
+  }
+  
+  .file-upload-container {
+    margin: 1rem 0;
+  }
+  
+  .file-input {
+    padding: 1rem;
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    margin: 2rem 0;
+  }
+  
+  .error-text {
+    color: var(--ion-color-danger);
+  }
+  
+  ion-card {
+    margin-bottom: 1rem;
+  }
+  
+  ion-segment {
+    margin-bottom: 1rem;
+  }

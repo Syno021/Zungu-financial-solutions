@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Healixir | Advanced Healthcare & EHR Platform in South Africa</title>
+
+  <base href="/" />
+
+  <meta name="color-scheme" content="light dark" />
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Healixir is a secure healthcare management platform in South Africa. Manage EHR, staff, prescriptions, labs & analytics—built for clinics, hospitals & caregivers." />
+  <meta name="keywords" content="healthcare software South Africa, EHR platform Durban, medical management SA, hospital software, patient records, clinic software" />
+  <meta name="author" content="Healixir Team" />
+  <link rel="canonical" href="https://healixir.org" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="Healixir | Leading Healthcare & EHR Platform in South Africa" />
+  <meta property="og:description" content="Secure healthcare platform for hospitals & clinics in South Africa. Manage EHR, labs, prescriptions & staff efficiently." />
+  <meta property="og:image" content="https://healixir.org/assets/logo.png" />
+  <meta property="og:url" content="https://healixir.org" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_ZA" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Healixir | Best Healthcare Platform in South Africa" />
+  <meta name="twitter:description" content="EHR, lab management, patient records & hospital administration—Healixir makes healthcare management seamless in South Africa." />
+  <meta name="twitter:image" content="https://healixir.org/assets/logoIcon.png" />
+
+  <!-- Icons & PWA Setup -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logoIcon-32x32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logoIcon-192x192.png">
+  <link rel="apple-touch-icon" href="assets/logoIcon-180x180.png">
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MedicalOrganization",
+    "name": "Healixir",
+    "url": "https://healixir.org",
+    "logo": "https://healixir.org/assets/logoIcon.png",
+    "description": "A universal healthcare platform for facilities, staff, and patients in South Africa. Manage EHR, prescriptions, and lab requests seamlessly.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Health Street",
+      "addressLocality": "Durban",
+      "addressRegion": "KwaZulu-Natal",
+      "postalCode": "4001",
+      "addressCountry": "ZA"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+27-31-123-4567",
+      "contactType": "customer service"
+    },
+    "medicalSpecialty": ["PrimaryCare", "Cardiology", "Dermatology", "Pediatrics"]
+  }
+  </script>
+
+  <!-- Performance & Web Vitals Optimization -->
+  <link rel="preload" href="assets/main.css" as="style" />
+  <link rel="preload" href="assets/main.js" as="script" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" />
+
+  <!-- Ionic Web Components -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@latest/dist/ionic/ionic.esm.js"></script>
+
+  <!-- Lazy Load JavaScript -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let lazyScripts = ["assets/main.js"];
+      lazyScripts.forEach(scriptSrc => {
+        let script = document.createElement("script");
+        script.src = scriptSrc;
+        script.defer = true;
+        document.body.appendChild(script);
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+  <ion-app>
+    <app-root></app-root>
+  </ion-app>
+
+  <!-- Service Worker for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+
+</html>

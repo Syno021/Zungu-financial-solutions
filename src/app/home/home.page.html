@@ -1,0 +1,265 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="ion-color-primary">
+    <ion-buttons slot="start">
+      <ion-button>
+        <ion-icon slot="icon-only" name="medkit-outline"></ion-icon>
+        <img src="assets/logoIcon.png" alt="Healixir Logo" >
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Healixir
+    </ion-title>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <!-- Hero Section -->
+  <div class="hero-container healixir-slide-up">
+    <h1 class="emerald-accent">Empower. Access. Thrive.</h1>
+    <p>Universal healthcare management platform for facilities, staff, and patients</p>
+    
+    <ion-segment value="facility" class="user-type-segment ion-margin-vertical">
+      <ion-segment-button value="facility">
+        <ion-label>Facility</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="caregiver">
+        <ion-label>Caregiver</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="patient">
+        <ion-label>Patient</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    
+    <ion-button class="button-primary ion-margin-bottom" expand="block" (click)="toggleLoginCard()">
+      Get Started
+      <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
+  
+  <!-- Quick Actions -->
+  <div class="quick-actions ion-margin-vertical healixir-fade-in">
+    <ion-card class="action-card emerald-border-left">
+      <ion-card-content>
+        <ion-icon name="person-add-outline" class="emerald-accent"></ion-icon>
+        <div class="action-text">
+          <h3>Patient Registration</h3>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-card class="action-card emerald-border-left">
+      <ion-card-content>
+        <ion-icon name="clipboard-outline" class="emerald-accent"></ion-icon>
+        <div class="action-text">
+          <h3>Medical Records</h3>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-card class="action-card emerald-border-left">
+      <ion-card-content>
+        <ion-icon name="qr-code-outline" class="emerald-accent"></ion-icon>
+        <div class="action-text">
+          <h3>Scan Patient Card</h3>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-card class="action-card emerald-border-left">
+      <ion-card-content>
+        <ion-icon name="flask-outline" class="emerald-accent"></ion-icon>
+        <div class="action-text">
+          <h3>Lab Results</h3>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  
+  <!-- Features Highlight -->
+  <div class="features-section ion-margin-top healixir-fade-in">
+    <h2 class="section-title emerald-accent">Key Features</h2>
+    
+    <ion-card class="feature-card mint-background">
+      <ion-card-content>
+        <div class="feature-icon-container">
+          <ion-icon name="document-text-outline" class="feature-icon emerald-accent"></ion-icon>
+        </div>
+        <div class="feature-content">
+          <h3>EHR Management</h3>
+          <p>Secure patient records with audit trails and role-based access</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-card class="feature-card mint-background">
+      <ion-card-content>
+        <div class="feature-icon-container">
+          <ion-icon name="medkit-outline" class="feature-icon emerald-accent"></ion-icon>
+        </div>
+        <div class="feature-content">
+          <h3>Facility Management</h3>
+          <p>Dynamic room allocation and resource tracking</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    
+    <ion-card class="feature-card mint-background">
+      <ion-card-content>
+        <div class="feature-icon-container">
+          <ion-icon name="analytics-outline" class="feature-icon emerald-accent"></ion-icon>
+        </div>
+        <div class="feature-content">
+          <h3>Analytics & Insights</h3>
+          <p>Optimize operations with real-time healthcare metrics</p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+  
+  <!-- Status Section -->
+  <ion-card class="status-card ion-margin-top emerald-border-left healixir-fade-in">
+    <ion-card-header>
+      <ion-card-title>System Status</ion-card-title>
+      <ion-card-subtitle>All systems operational</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="status-item">
+        <div class="status-label">
+          <ion-icon name="shield-checkmark-outline" class="status-icon"></ion-icon>
+          <span>Security</span>
+        </div>
+        <ion-badge color="success">Active</ion-badge>
+      </div>
+      
+      <div class="status-item">
+        <div class="status-label">
+          <ion-icon name="server-outline" class="status-icon"></ion-icon>
+          <span>Database</span>
+        </div>
+        <ion-badge color="success">Online</ion-badge>
+      </div>
+
+      
+      
+      <div class="status-item">
+        <div class="status-label">
+          <ion-icon name="cloud-offline-outline" class="status-icon"></ion-icon>
+          <span>Offline Mode</span>
+        </div>
+        <ion-badge color="primary">Ready</ion-badge>
+      </div>
+      <div class="status-item">
+        <div class="status-label">
+          <ion-icon name="notifications-outline" class="status-icon"></ion-icon>
+          <span>Notifications</span>
+        </div>
+        <ion-badge color="success">Active</ion-badge>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="login-card-container" [ngClass]="{'active': showLoginCard}">
+    <div class="login-backdrop" (click)="closeLoginCard()"></div>
+    
+    <!-- Main Login Card -->
+    <div class="login-card" *ngIf="!showResetCard">
+      <div class="login-card-header">
+        <h3 class="login-card-title">
+          <ion-icon name="log-in-outline" class="login-header-icon"></ion-icon>
+          Log in to Healixir
+        </h3>
+        <button class="login-close-button" (click)="closeLoginCard()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      <div class="login-card-content">
+        <!-- User Type Pills -->
+        <div class="user-type-pills">
+          <div class="user-type-pill" [ngClass]="{'active': selectedUserType === 'facility'}" (click)="selectUserType('facility')">Facility</div>
+          <div class="user-type-pill" [ngClass]="{'active': selectedUserType === 'caregiver'}" (click)="selectUserType('caregiver')">Caregiver</div>
+          <div class="user-type-pill" [ngClass]="{'active': selectedUserType === 'patient'}" (click)="selectUserType('patient')">Patient</div>
+        </div>
+        
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" class="form-input" formControlName="email" placeholder="Enter your email">
+            <div class="error-message" *ngIf="emailControl?.touched && emailControl?.errors">
+              <span *ngIf="emailControl?.errors?.['required']">Email is required</span>
+              <span *ngIf="emailControl?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-input" formControlName="password" placeholder="Enter your password">
+            <div class="error-message" *ngIf="passwordControl?.touched && passwordControl?.errors">
+              <span *ngIf="passwordControl?.errors?.['required']">Password is required</span>
+              <span *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 6 characters</span>
+            </div>
+          </div>
+          
+          <div class="login-options">
+            <div class="remember-me">
+              <input type="checkbox" id="remember" formControlName="rememberMe">
+              <label for="remember">Remember me</label>
+            </div>
+            <a href="javascript:void(0)" class="forgot-password" (click)="toggleResetPassword()">Forgot password?</a>
+          </div>
+          
+          <button type="submit" class="login-button" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Log in</span>
+            <ion-spinner *ngIf="isLoading" name="circles" class="button-spinner"></ion-spinner>
+            <ion-icon *ngIf="!isLoading" name="log-in-outline" class="button-icon"></ion-icon>
+          </button>
+        </form>
+        
+      
+        
+        <div class="signup-link" routerLink="/auth">
+          Don't have an account? <a>Sign up</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Password Reset Card -->
+    <div class="login-card" *ngIf="showResetCard">
+      <div class="login-card-header">
+        <h3 class="login-card-title">
+          <ion-icon name="key-outline" class="login-header-icon"></ion-icon>
+          Reset Password
+        </h3>
+        <button class="login-close-button" (click)="closeLoginCard()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      <div class="login-card-content">
+        <p class="reset-instructions">Enter your email address, and we'll send you a link to reset your password.</p>
+        
+        <form [formGroup]="resetPasswordForm" (ngSubmit)="resetPassword()">
+          <div class="form-group">
+            <label for="reset-email">Email Address</label>
+            <input type="email" id="reset-email" class="form-input" formControlName="email" placeholder="Enter your email">
+            <div class="error-message" *ngIf="resetEmailControl?.touched && resetEmailControl?.errors">
+              <span *ngIf="resetEmailControl?.errors?.['required']">Email is required</span>
+              <span *ngIf="resetEmailControl?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+          
+          <button type="submit" class="login-button">
+            Send Reset Link
+            <ion-icon name="send-outline" class="button-icon"></ion-icon>
+          </button>
+          
+          <button type="button" class="back-button" (click)="toggleResetPassword()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+            Back to Login
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ion-content>
+

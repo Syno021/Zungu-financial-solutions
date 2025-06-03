@@ -1,0 +1,258 @@
+// Navigation Menu Styles
+.healixir-nav-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 280px;
+  background-color: var(--ion-item-background);
+  box-shadow: 4px 0 16px rgba(46, 125, 50, 0.12);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ion-border-color);
+  overflow-y: auto;
+  transition: transform var(--healixir-transition-normal) var(--healixir-easing);
+  
+  // Left accent border using the primary emerald color
+  border-left: 4px solid var(--ion-color-primary-base);
+  
+  // Default state is closed (off-screen)
+  transform: translateX(-100%);
+  
+  &.menu-open {
+    transform: translateX(0);
+  }
+}
+
+// Menu overlay for when menu is open
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  animation: fadeIn 0.2s var(--healixir-easing);
+}
+
+// Logo and header section
+.nav-header {
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--ion-border-color);
+  
+  &.primary-bg {
+    background-color: var(--ion-color-primary-base);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .logo-container {
+      .logo-text {
+        color: white;
+      }
+    }
+    
+    .close-button {
+      --color: white;
+      
+      .menu-toggle-icon {
+        color: white;
+      }
+    }
+  }
+  
+  // Default background when not using primary
+  &:not(.primary-bg) {
+    background-color: rgba(165, 214, 167, 0.1); // Subtle mint background
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+    
+    .logo-icon {
+      height: 24px; // Adjust based on your logo's dimensions
+      margin-right: 12px;
+    }
+    
+    .logo-text {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ion-color-primary-base);
+    }
+  }
+  
+  .close-button {
+    --padding-start: 5px;
+    --padding-end: 5px;
+    height: 36px;
+    
+    .menu-toggle-icon {
+      font-size: 24px;
+    }
+  }
+}
+
+// Navigation items container
+.nav-items-container {
+  flex: 1;
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+// Individual navigation item
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--healixir-transition-fast) var(--healixir-easing);
+  position: relative;
+  
+  &:hover {
+    background-color: rgba(165, 214, 167, 0.15); // Light mint hover state
+  }
+  
+  &.active {
+    background-color: rgba(46, 125, 50, 0.15); // Light emerald active state
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.1);
+    
+    .item-title {
+      color: var(--ion-color-primary-base);
+      font-weight: 600;
+    }
+  }
+  
+  .icon-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    background-color: rgba(var(--ion-color-base-rgb), 0.15);
+    
+    ion-icon {
+      font-size: 18px;
+      color: var(--ion-color-base);
+    }
+  }
+  
+  .item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ion-text-color-primary);
+    transition: all var(--healixir-transition-fast) var(--healixir-easing);
+  }
+  
+  .arrow-icon {
+    position: absolute;
+    right: 12px;
+    color: var(--ion-color-primary-base);
+    font-size: 16px;
+  }
+}
+
+// Footer section with user profile
+.nav-footer {
+  padding: 16px;
+  border-top: 1px solid var(--ion-border-color);
+  background-color: rgba(165, 214, 167, 0.05);
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    .avatar-container {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(var(--ion-color-mint-base-rgb), 0.2);
+      margin-right: 12px;
+      
+      ion-icon {
+        font-size: 24px;
+        color: var(--ion-color-mint-base);
+      }
+    }
+    
+    .user-info {
+      .user-name {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ion-text-color-primary);
+      }
+      
+      .user-role {
+        margin: 0;
+        font-size: 12px;
+        color: var(--ion-text-color-secondary);
+      }
+    }
+  }
+  
+  .footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    
+    ion-button {
+      --color: var(--ion-color-primary-base);
+      margin-left: 8px;
+    }
+  }
+}
+
+// Adjust main content when menu is open
+ion-router-outlet.with-menu-open {
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  transition: all var(--healixir-transition-normal) var(--healixir-easing);
+}
+
+// Animation for fade-in effect
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// For larger screens, apply a push effect instead of overlay
+@media (min-width: 992px) {
+  .healixir-nav-menu {
+    &.menu-open {
+      transform: translateX(0);
+    }
+  }
+  
+  ion-router-outlet.with-menu-open {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+}
+
+// For mobile screens, ensure menu overlays content
+@media (max-width: 768px) {
+  .healixir-nav-menu {
+    width: 260px;
+    
+    &.menu-open {
+      transform: translateX(0);
+    }
+  }
+  
+  ion-router-outlet.with-menu-open {
+    margin-left: 0;
+    width: 100%;
+  }
+}

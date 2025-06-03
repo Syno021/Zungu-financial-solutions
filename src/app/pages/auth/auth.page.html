@@ -1,0 +1,216 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <div class="header-content">
+      <ion-img src="assets/logoIcon.png" class="logo" alt="Healixir Logo"></ion-img>
+      <div class="header-text">
+        <ion-title>Healixir</ion-title>
+        <ion-note>Empower. Access. Thrive.</ion-note>
+      </div>
+    </div>
+    <div class="system-status">
+      <ion-chip color="success">
+        <ion-icon name="checkmark-circle"></ion-icon>
+        <ion-label>All Systems Operational</ion-label>
+      </ion-chip>
+      <ion-chip color="secondary">
+        <ion-icon name="shield-checkmark"></ion-icon>
+        <ion-label>Security Active</ion-label>
+      </ion-chip>
+      <ion-chip color="tertiary">
+        <ion-icon name="server"></ion-icon>
+        <ion-label>Database Online</ion-label>
+      </ion-chip>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid class="auth-container">
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" sizeLg="8" sizeXl="6">
+        <ion-card class="elevated-card">
+          <ion-card-header class="card-header">
+            <ion-card-title>Healthcare Facility Registration</ion-card-title>
+            <ion-card-subtitle>Complete your institution's onboarding</ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <form (ngSubmit)="onSubmit()" class="staggered-form">
+              <div class="form-section">
+                <h3 class="section-title">
+                  <ion-icon name="business-outline"></ion-icon>
+                  Facility Information
+                </h3>
+                <ion-item lines="none" class="input-item">
+                  <ion-label position="stacked">Facility Name</ion-label>
+                  <ion-input [(ngModel)]="facility.name" name="name" type="text" required></ion-input>
+                  <ion-note slot="error" *ngIf="nameError">Facility name is required</ion-note>
+                </ion-item>
+
+                <ion-item lines="none" class="input-item">
+                  <ion-label position="stacked">Facility Type</ion-label>
+                  <ion-select [(ngModel)]="facility.type" name="type" interface="popover">
+                    <ion-select-option *ngFor="let type of facilityTypes" [value]="type">
+                      {{ type }}
+                    </ion-select-option>
+                  </ion-select>
+                  <ion-note slot="error" *ngIf="typeError">Facility type is required</ion-note>
+                </ion-item>
+
+                <ion-item lines="none" class="input-item">
+                  <ion-label position="stacked">Registration Number</ion-label>
+                  <ion-input [(ngModel)]="facility.registrationNumber" name="registrationNumber" type="text" required></ion-input>
+                  <ion-note slot="error" *ngIf="registrationNumberError">Registration number is required</ion-note>
+                </ion-item>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-title">
+                  <ion-icon name="location-outline"></ion-icon>
+                  Address Information
+                </h3>
+                <div class="address-grid">
+                 <ion-item lines="full">
+            <ion-label position="floating">Street Address</ion-label>
+            <ion-input [(ngModel)]="facility.location.street" name="street" type="text"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="streetError">
+            <small class="error-message">Street address is required</small>
+          </ion-text>
+          
+          <ion-item lines="full">
+            <ion-label position="floating">City</ion-label>
+            <ion-input [(ngModel)]="facility.location.city" name="city" type="text"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="cityError">
+            <small class="error-message">City is required</small>
+          </ion-text>
+          
+          <ion-item lines="full">
+            <ion-label position="floating">State/Province</ion-label>
+            <ion-input [(ngModel)]="facility.location.province" name="province" type="text"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="stateError">
+            <small class="error-message">State/Province is required</small>
+          </ion-text>
+          
+          <ion-item lines="full">
+            <ion-label position="floating">Postal Code</ion-label>
+            <ion-input [(ngModel)]="facility.location.postalCode" name="postalCode" type="text"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="postalCodeError">
+            <small class="error-message">Postal code is required</small>
+          </ion-text>
+          
+          <ion-item lines="full">
+            <ion-label position="floating">Country</ion-label>
+            <ion-input [(ngModel)]="facility.location.country" name="country" type="text" value="South Africa"></ion-input>
+          </ion-item>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-title">
+                  <ion-icon name="person-circle-outline"></ion-icon>
+                  Contact Details
+                </h3>
+               <ion-item lines="full">
+            <ion-label position="floating">Contact Email</ion-label>
+            <ion-input [(ngModel)]="facility.contactEmail" name="contactEmail" type="email"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="emailError">
+            <small class="error-message">Valid email is required</small>
+          </ion-text>
+          
+          <ion-item lines="full">
+            <ion-label position="floating">Contact Phone</ion-label>
+            <ion-input [(ngModel)]="facility.contactPhone" name="contactPhone" type="tel"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="phoneError">
+            <small class="error-message">Contact phone is required</small>
+          </ion-text>
+          
+              </div>
+
+              <div class="form-section">
+                <h3 class="section-title">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                  Security Credentials
+                </h3>
+                <ion-item lines="full">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'"></ion-input>
+            <ion-button slot="end" fill="clear" (click)="togglePasswordVisibility()">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <ion-text color="danger" *ngIf="passwordError">
+            <small class="error-message">Password must be at least 8 characters</small>
+          </ion-text>
+              </div>
+
+              <ion-button type="submit" expand="block" shape="round" class="submit-button">
+                Complete Registration
+                <ion-icon slot="end" name="arrow-forward-circle"></ion-icon>
+              </ion-button>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" sizeLg="4" sizeXl="3">
+        <div class="feature-highlights">
+          <ion-card class="feature-card">
+            <ion-icon name="document-text-outline" color="primary"></ion-icon>
+            <ion-card-header>
+              <ion-card-title>EHR Management</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Secure patient records with audit trails and role-based access
+            </ion-card-content>
+          </ion-card>
+          
+          <ion-card class="feature-card">
+            <ion-icon name="git-network" color="secondary"></ion-icon>
+            <ion-card-header>
+              <ion-card-title>Facility Management</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Dynamic room allocation, resource tracking, and inventory management
+            </ion-card-content>
+          </ion-card>
+          
+          <ion-card class="feature-card">
+            <ion-icon name="analytics-outline" color="secondary"></ion-icon>
+            <ion-card-header>
+              <ion-card-title>Analytics & Insights</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Optimize operations with real-time healthcare metrics
+            </ion-card-content>
+          </ion-card>
+          
+          <ion-card class="feature-card">
+            <ion-icon name="people-outline" color="primary"></ion-icon>
+            <ion-card-header>
+              <ion-card-title>Patient Portal</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Live result checks, appointment booking, and secure messaging
+            </ion-card-content>
+          </ion-card>
+          
+          <ion-card class="feature-card">
+            <ion-icon name="notifications-outline" color="tertiary"></ion-icon>
+            <ion-card-header>
+              <ion-card-title>Notifications</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              Test result alerts and appointment reminders for patients and staff
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

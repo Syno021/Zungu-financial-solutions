@@ -1,0 +1,265 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Inventory Management</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="scanner-container" *ngIf="scanning">
+    <zxing-scanner 
+      [enable]="scanning"
+      [formats]="['QR_CODE', 'EAN_13', 'CODE_128', 'DATA_MATRIX']"
+      (scanSuccess)="handleScan($event)"
+      class="scanner">
+    </zxing-scanner>
+    
+    <div class="scanner-overlay">
+      
+    
+
+      <div class="scan-frame">  <video #scannerVideo class="scanner-video"></video></div>
+      <div class="scanner-instructions">
+        <p>Align the barcode within the frame</p>
+      </div>
+      <ion-button (click)="switchCamera()" class="switch-camera-button" fill="clear">
+        <ion-icon name="camera-reverse" slot="icon-only" class="switch-icon"></ion-icon>
+      </ion-button>
+      <ion-button (click)="cancelScanning()" class="cancel-scan-button" color="light">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <ion-button (click)="toggleManualEntry()" expand="block" [color]="showManualEntry ? 'medium' : 'primary'">
+      <ion-icon [name]="showManualEntry ? 'close-outline' : 'add-outline'" slot="start"></ion-icon>
+      {{ showManualEntry ? 'Cancel' : 'Add Manual' }}
+    </ion-button>
+    <ion-button (click)="startScanning()" expand="block" [disabled]="scanning" color="secondary">
+      <ion-icon name="barcode-outline" slot="start"></ion-icon>
+      {{ scanning ? 'Scanning...' : 'Scan Barcode' }}
+    </ion-button>
+  </div>
+  
+  <!-- Empty state (add to your component logic) -->
+  <div class="empty-state" *ngIf="inventoryItems.length === 0 && !showManualEntry">
+    <ion-icon name="cube-outline"></ion-icon>
+    <h3>No inventory items yet</h3>
+    <p>Add your first item manually or scan a barcode</p>
+    <ion-button (click)="toggleManualEntry()" expand="block" color="primary">
+      <ion-icon name="add-outline" slot="start"></ion-icon>
+      Add First Item
+    </ion-button>
+  </div>
+<!-- Equipment Stats -->
+<div class="equipment-stats" *ngIf="currentCategory === 'EQUIPMENT' && inventoryItems.length > 0">
+  <ion-chip color="success">
+    <ion-label>Working: {{workingCount}} units</ion-label>
+  </ion-chip>
+  <ion-chip color="warning">
+    <ion-label>Needs Repair: {{needsRepairCount}} units</ion-label>
+  </ion-chip>
+  <ion-chip color="danger">
+    <ion-label>Out of Service: {{outOfServiceCount}} units</ion-label>
+  </ion-chip>
+</div>
+
+<!-- Supply Stats -->
+<div class="inventory-stats" *ngIf="currentCategory === 'SUPPLY' && inventoryItems.length > 0">
+  <ion-chip color="primary">
+    <ion-label>Total: {{supplyStats.totalQuantity}} units</ion-label>
+  </ion-chip>
+  <ion-chip color="warning" *ngIf="supplyStats.needsReorder > 0">
+    <ion-label>Reorder: {{supplyStats.needsReorder}} items</ion-label>
+  </ion-chip>
+  <ion-chip color="danger" *ngIf="supplyStats.lowStock > 0">
+    <ion-label>Low Stock: {{supplyStats.lowStock}} items</ion-label>
+  </ion-chip>
+</div>
+
+<!-- Medication Stats -->
+<div class="inventory-stats" *ngIf="currentCategory === 'MEDICATION' && inventoryItems.length > 0">
+  <ion-chip color="primary">
+    <ion-label>Total: {{medicationStats.totalQuantity}} units</ion-label>
+  </ion-chip>
+  <ion-chip color="warning" *ngIf="medicationStats.needsReorder > 0">
+    <ion-label>Reorder: {{medicationStats.needsReorder}} items</ion-label>
+  </ion-chip>
+  <ion-chip color="danger" *ngIf="medicationStats.lowStock > 0">
+    <ion-label>Low Stock: {{medicationStats.lowStock}} items</ion-label>
+  </ion-chip>
+  <ion-chip color="tertiary" *ngIf="medicationStats.expiringSoon > 0">
+    <ion-label>Expiring Soon: {{medicationStats.expiringSoon}} items</ion-label>
+  </ion-chip>
+</div>
+
+
+  <div class="category-filters">
+    <button [class.active]="currentCategory === 'MEDICATION'" (click)="filterByCategory('MEDICATION')">
+      Medication
+    </button>
+    <button [class.active]="currentCategory === 'SUPPLY'" (click)="filterByCategory('SUPPLY')">
+      Supply
+    </button>
+    <button [class.active]="currentCategory === 'EQUIPMENT'" (click)="filterByCategory('EQUIPMENT')">
+      Equipment
+    </button>
+  </div>
+
+
+  <!-- Manual Entry Form -->
+  <ion-card *ngIf="showManualEntry" class="entry-form">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon [name]="isEditing ? 'create-outline' : 'add-circle-outline'" class="title-icon"></ion-icon>
+        {{ isEditing ? 'Edit Item' : 'New Inventory Item' }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="inventoryForm" (ngSubmit)="submitForm()">
+
+        <ion-item>
+          <ion-label position="stacked">Barcode</ion-label>
+          <ion-input formControlName="barcode" placeholder="Enter item barcode"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Name</ion-label>
+          <ion-input formControlName="name" placeholder="Enter item name"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Category</ion-label>
+          <ion-select formControlName="category" interface="popover">
+            <ion-select-option value="MEDICATION">Medication</ion-select-option>
+            <ion-select-option value="SUPPLY">Supply</ion-select-option>
+            <ion-select-option value="EQUIPMENT">Equipment</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item *ngIf="inventoryForm.get('category')?.value === 'EQUIPMENT'">
+          <ion-label position="stacked">Condition</ion-label>
+          <ion-select formControlName="condition" interface="popover">
+            <ion-select-option value="WORKING">Working</ion-select-option>
+            <ion-select-option value="NEEDS_REPAIR">Needs Repair</ion-select-option>
+            <ion-select-option value="OUT_OF_SERVICE">Out of Service</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+
+        <div class="form-row">
+          <ion-item class="form-group">
+            <ion-label position="stacked">Quantity</ion-label>
+            <ion-input type="number" formControlName="quantity" placeholder="0"></ion-input>
+          </ion-item>
+
+          <ion-item class="form-group">
+            <ion-label position="stacked">Unit</ion-label>
+            <ion-input formControlName="unit" placeholder="pcs"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Unit Price (ZAR)</ion-label>
+          <ion-input type="number" formControlName="unitPrice" placeholder="0.00"></ion-input>
+        </ion-item>
+
+        <div class="form-row">
+          <ion-item class="form-group">
+            <ion-label position="stacked">Min Stock</ion-label>
+            <ion-input type="number" formControlName="minStock" placeholder="10"></ion-input>
+          </ion-item>
+
+          <ion-item class="form-group">
+            <ion-label position="stacked">Max Stock</ion-label>
+            <ion-input type="number" formControlName="maxStock" placeholder="1000"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Reorder Level</ion-label>
+          <ion-input type="number" formControlName="reorderLevel" placeholder="25"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Supplier</ion-label>
+          <ion-input formControlName="supplier" placeholder="Enter supplier name"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Location</ion-label>
+          <ion-input formControlName="location" placeholder="Storage location"></ion-input>
+        </ion-item>
+        
+
+        <ion-item>
+          <ion-label position="stacked">Expiration Date</ion-label>
+          <ion-datetime formControlName="expirationDate" displayFormat="MMM DD, YYYY"></ion-datetime>
+        </ion-item>
+
+        <div class="form-actions">
+          <ion-button type="submit" expand="block" [disabled]="!inventoryForm.valid" color="primary">
+            <ion-icon [name]="isEditing ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+            {{ isEditing ? 'Update Item' : 'Add Item' }}
+          </ion-button>
+          <ion-button expand="block" fill="outline" (click)="cancelEdit()" color="medium">
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Cancel
+          </ion-button>
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Inventory List Section Header -->
+  <div class="section-header" *ngIf="inventoryItems.length > 0">
+    Inventory Items ({{inventoryItems.length}})
+  </div>
+
+  <!-- Inventory List -->
+  <ion-list  class="inventory-container" [class.loading]="loading">
+    <ion-item-sliding *ngFor="let item of inventoryItems">
+      <ion-item>
+        <ion-label>
+          <h2>{{ item.name }}</h2>
+          <div class="item-details">
+            <span class="category-badge" [ngClass]="item.category.toLowerCase()">{{ item.category }}</span>
+            <p>Quantity: {{ item.quantity }} {{ item.unit }}</p>
+          </div>
+          <div class="stock-level" [ngClass]="{'low': item.quantity <= item.minStock, 'medium': item.quantity > item.minStock && item.quantity <= item.reorderLevel, 'good': item.quantity > item.reorderLevel}">
+            <div class="indicator" [ngClass]="{'low': item.quantity <= item.minStock, 'medium': item.quantity > item.minStock && item.quantity <= item.reorderLevel, 'good': item.quantity > item.reorderLevel}"></div>
+            <span>{{ item.quantity <= item.minStock ? 'Low stock' : (item.quantity <= item.reorderLevel ? 'Medium stock' : 'Good stock') }}</span>
+          </div>
+          <p *ngIf="item.expirationDate" class="expiration">
+            <ion-icon name="calendar-outline" class="small-icon"></ion-icon>
+            Expires: {{ item.expirationDate | date:'MMM d, y' }}
+          </p>
+        </ion-label>
+        <div class="price-adjust" slot="end">
+          <ion-note>
+            ZAR {{ item.unitPrice | number:'1.2-2' }}
+          </ion-note>
+          <div class="adjust-buttons">
+            <ion-button fill="dark" size="small" color="danger" (click)="adjustStock(item.id, -1)">
+              <ion-icon color="dark"  name="remove" class="adjustStockIcon"></ion-icon>
+            </ion-button>
+            <span class="quantity-display">{{ item.quantity }}</span>
+            <ion-button fill="clear" size="small" color="success" (click)="adjustStock(item.id, 1)">
+              <ion-icon color="dark"  name="add" class="adjustStockIcon"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-item>
+      
+      <ion-item-options side="end">
+        <ion-item-option color="primary" (click)="editItem(item)">
+          <ion-icon name="create-outline" slot="icon-only"></ion-icon>
+        </ion-item-option>
+        
+        <ion-item-option color="danger" (click)="deleteItem(item.id)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>

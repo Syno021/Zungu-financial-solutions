@@ -1,0 +1,90 @@
+/* icd10-selection-modal.component.scss */
+:host {
+    ion-segment {
+      --background: var(--ion-color-light);
+      padding: 5px;
+    }
+  
+    ion-segment-button {
+      --background-checked: var(--ion-color-primary);
+      --color-checked: var(--ion-color-primary-contrast);
+      --indicator-color: var(--ion-color-primary);
+      text-transform: capitalize;
+    }
+  
+    ion-searchbar {
+      --box-shadow: none;
+      --background: var(--ion-color-light);
+      padding: 0 10px;
+    }
+  
+    ion-badge {
+      margin-right: 5px;
+      padding: 5px 8px;
+    }
+  
+    .grid-container {
+      padding: 10px;
+      
+      ion-card {
+        margin: 8px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+  
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+  
+      ion-card-subtitle {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+  
+      ion-card-content {
+        padding-top: 10px;
+      }
+    }
+  
+    ion-item {
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --padding-top: 10px;
+      --padding-bottom: 10px;
+      
+      h2 {
+        font-weight: bold;
+        color: var(--ion-color-dark);
+      }
+  
+      h3 {
+        font-size: 0.9em;
+        color: var(--ion-color-medium);
+        margin-top: 4px;
+      }
+  
+      p {
+        margin-top: 8px;
+      }
+    }
+  }
+
+  ion-item.selected {
+    --background: #bbbbbb;
+    color: white;
+  }
+  
+  ion-item.selected ion-icon {
+    color: white;
+  }
+  
+ion-card.selected {
+    --background: #bbbbbb;
+    color: white;
+  }
+  
+  ion-card.selected ion-icon {
+    color: white;
+  }

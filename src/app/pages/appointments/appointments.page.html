@@ -1,0 +1,137 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Book Appointment</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="submissionSuccess" class="success-message">
+    <ion-card color="success">
+      <ion-card-header>
+        <ion-card-title>Success!</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Your appointment has been booked successfully.
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>New Appointment</ion-card-title>
+      <ion-card-subtitle *ngIf="patientData">
+        Patient: {{ patientData.firstName }} {{ patientData.lastName }}
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form [formGroup]="appointmentForm" (ngSubmit)="submitAppointment()">
+        <ion-list lines="full">
+          <!-- Appointment Type -->
+          <ion-item [class.ion-invalid]="appointmentForm.get('appointmentType')?.touched && appointmentForm.get('appointmentType')?.invalid">
+            <ion-label position="stacked">Appointment Type <ion-text color="danger">*</ion-text></ion-label>
+            <ion-select formControlName="appointmentType" placeholder="Select type" interface="action-sheet">
+              <ion-select-option *ngFor="let type of appointmentTypes" [value]="type">
+                {{ type }}
+              </ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="appointmentForm.get('appointmentType')?.touched && appointmentForm.get('appointmentType')?.invalid">
+              {{ validationMessages['appointmentType'] || 'Please select an appointment type' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Appointment Status -->
+          <ion-item [class.ion-invalid]="appointmentForm.get('appointmentStatus')?.touched && appointmentForm.get('appointmentStatus')?.invalid">
+            <ion-label position="stacked">Status <ion-text color="danger">*</ion-text></ion-label>
+            <ion-select formControlName="appointmentStatus" placeholder="Select status" interface="action-sheet">
+              <ion-select-option *ngFor="let status of appointmentStatuses" [value]="status">
+                {{ status }}
+              </ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="appointmentForm.get('appointmentStatus')?.touched && appointmentForm.get('appointmentStatus')?.invalid">
+              {{ validationMessages['appointmentStatus'] || 'Please select a status' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Doctor Selection -->
+          <ion-item [class.ion-invalid]="appointmentForm.get('doctor')?.touched && appointmentForm.get('doctor')?.invalid">
+            <ion-label position="stacked">Doctor <ion-text color="danger">*</ion-text></ion-label>
+            <ion-select formControlName="doctor" placeholder="Select doctor" interface="action-sheet">
+              <ion-select-option *ngFor="let staff of staffList" [value]="staff.staffId">
+                Dr. {{ staff.name }} ({{ staff.specialization }})
+              </ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="appointmentForm.get('doctor')?.touched && appointmentForm.get('doctor')?.invalid">
+              {{ validationMessages['doctor'] || 'Please select a doctor' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Preferred Date -->
+          <ion-item [class.ion-invalid]="appointmentForm.get('preferredDate')?.touched && appointmentForm.get('preferredDate')?.invalid">
+            <ion-label position="stacked">Preferred Date <ion-text color="danger">*</ion-text></ion-label>
+            <ion-datetime
+              formControlName="preferredDate"
+              display-format="MMM DD, YYYY"
+              picker-format="MMM DD YYYY"
+              [min]="minDate"
+              placeholder="Select date">
+            </ion-datetime>
+            <ion-note slot="error" *ngIf="appointmentForm.get('preferredDate')?.touched && appointmentForm.get('preferredDate')?.invalid">
+              {{ validationMessages['preferredDate'] || 'Please select a valid date' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Preferred Time -->
+          <ion-item [class.ion-invalid]="appointmentForm.get('preferredTime')?.touched && appointmentForm.get('preferredTime')?.invalid">
+            <ion-label position="stacked">Preferred Time <ion-text color="danger">*</ion-text></ion-label>
+            <ion-datetime
+              formControlName="preferredTime"
+              display-format="hh:mm A"
+              picker-format="hh mm A"
+              placeholder="Select time">
+            </ion-datetime>
+            <ion-note slot="error" *ngIf="appointmentForm.get('preferredTime')?.touched && appointmentForm.get('preferredTime')?.invalid">
+              {{ validationMessages['preferredTime'] || 'Please select a valid time' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Reason for Visit -->
+          <ion-item [class.ion-invalid]="appointmentForm.get('reason')?.touched && appointmentForm.get('reason')?.invalid">
+            <ion-label position="stacked">Reason for Visit <ion-text color="danger">*</ion-text></ion-label>
+            <ion-textarea
+              formControlName="reason"
+              rows="3"
+              placeholder="Please describe the reason for your appointment">
+            </ion-textarea>
+            <ion-note slot="error" *ngIf="appointmentForm.get('reason')?.touched && appointmentForm.get('reason')?.invalid">
+              {{ validationMessages['reason'] || 'Please provide a reason for your visit' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Medical History -->
+          <ion-item>
+            <ion-label position="stacked">Relevant Medical History</ion-label>
+            <ion-textarea
+              formControlName="medicalHistory"
+              rows="3"
+              placeholder="Any relevant medical history or additional information">
+            </ion-textarea>
+          </ion-item>
+        </ion-list>
+
+        <div class="ion-padding">
+          <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="isSubmitting">
+            <ion-spinner name="circles" *ngIf="isSubmitting"></ion-spinner>
+            <span *ngIf="!isSubmitting">Book Appointment</span>
+          </ion-button>
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

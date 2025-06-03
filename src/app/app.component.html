@@ -1,0 +1,72 @@
+<ion-app>
+  <!-- Menu toggle button - only shows on allowed pages -->
+  <ion-header *ngIf="showMenuEnabled">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="toggleMenu()">
+          <ion-icon slot="icon-only" name="menu" class="ion-color-primary"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>
+        {{ getActiveMenuTitle() }}
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <!-- Navigation Menu - only shows when toggled open and on allowed pages -->
+  <div *ngIf="showMenuEnabled"
+       class="healixir-nav-menu"
+       [class.menu-open]="menuOpen"
+       [class.menu-closed]="!menuOpen">
+    <div class="nav-header primary-bg">
+      <div class="logo-container">
+        <img src="assets/logoIcon.png" alt="Healixir Logo" class="logo-icon" />
+        <h2 class="logo-text">Healixir</h2>
+      </div>
+      <ion-button fill="clear" (click)="toggleMenu()" class="close-button">
+        <ion-icon name="close" class="menu-toggle-icon"></ion-icon>
+      </ion-button>
+    </div>
+    
+    <div class="nav-items-container">
+      <div *ngFor="let item of menuItems"
+           class="nav-item"
+           [class.active]="activeRoute === item.route"
+           (click)="navigateTo(item.route)">
+        <div class="icon-container ion-color-{{item.color}}">
+          <ion-icon [name]="item.icon"></ion-icon>
+        </div>
+        <span class="item-title">{{item.title}}</span>
+        <ion-icon name="chevron-forward" class="arrow-icon" *ngIf="activeRoute === item.route"></ion-icon>
+      </div>
+    </div>
+    
+    <div class="nav-footer">
+      <div class="user-profile">
+        <div class="avatar-container ion-color-mint">
+          <ion-icon name="person"></ion-icon>
+        </div>
+        <div class="user-info">
+          <h4 class="user-name">Dr. Sarah Green</h4>
+          <p class="user-role">Admin</p>
+        </div>
+      </div>
+      <div class="footer-actions">
+        <ion-button fill="clear" size="small">
+          <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" size="small">
+          <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Dark overlay that appears behind the menu when open -->
+  <div *ngIf="menuOpen && showMenuEnabled"
+       class="menu-overlay"
+       (click)="toggleMenu()"></div>
+  
+  <!-- Main content -->
+  <ion-router-outlet [class.with-menu-open]="menuOpen && showMenuEnabled"></ion-router-outlet>
+</ion-app>
