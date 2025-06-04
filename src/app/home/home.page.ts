@@ -6,7 +6,7 @@ import { AlertController, LoadingController } from '@ionic/angular';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss','home2.page.scss','home3.page.scss'],
+  styleUrls: ['home.page.scss'],
 })
 export class HomePage {
   showLoginCard = false;

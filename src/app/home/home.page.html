@@ -15,8 +15,9 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <!-- Hero Section -->
   <div class="hero-container zungu-slide-up">
-    <h1 class="emerald-accent">Finance. Empower. Prosper.</h1>
-    <p>Empowering individuals and businesses with accessible financial solutions</p>
+    <h1 class="emerald-accent">Zungu Financial Solutions</h1>
+    <h2 class="hero-subtitle">Simple, Fast, Reliable Loan Management</h2>
+    <p>Get quick and easy loans after completing your KYC verification. Apply today and receive funds in your account within 24 hours.</p>
     
     <ion-segment value="individual" class="user-type-segment ion-margin-vertical">
       <ion-segment-button value="individual">
@@ -75,18 +76,18 @@
     </ion-card>
   </div>
 
-  <!-- Features Highlight -->
+  <!-- Our Services Section -->
   <div class="features-section ion-margin-top zungu-fade-in">
     <h2 class="section-title emerald-accent">Our Services</h2>
 
     <ion-card class="feature-card mint-background">
       <ion-card-content>
         <div class="feature-icon-container">
-          <ion-icon name="wallet-outline" class="feature-icon emerald-accent"></ion-icon>
+          <ion-icon name="shield-checkmark-outline" class="feature-icon emerald-accent"></ion-icon>
         </div>
         <div class="feature-content">
-          <h3>Personal Loans</h3>
-          <p>Flexible terms, fast approval, and competitive interest rates</p>
+          <h3>Easy KYC Process</h3>
+          <p>Complete your KYC verification in minutes with our streamlined digital process.</p>
         </div>
       </ion-card-content>
     </ion-card>
@@ -94,11 +95,11 @@
     <ion-card class="feature-card mint-background">
       <ion-card-content>
         <div class="feature-icon-container">
-          <ion-icon name="briefcase-outline" class="feature-icon emerald-accent"></ion-icon>
+          <ion-icon name="flash-outline" class="feature-icon emerald-accent"></ion-icon>
         </div>
         <div class="feature-content">
-          <h3>Business Loans</h3>
-          <p>Funding solutions to grow and scale your enterprise</p>
+          <h3>Quick Loan Approval</h3>
+          <p>Get your loan approved within 24 hours with our advanced processing system.</p>
         </div>
       </ion-card-content>
     </ion-card>
@@ -106,15 +107,67 @@
     <ion-card class="feature-card mint-background">
       <ion-card-content>
         <div class="feature-icon-container">
-          <ion-icon name="trending-up-outline" class="feature-icon emerald-accent"></ion-icon>
+          <ion-icon name="options-outline" class="feature-icon emerald-accent"></ion-icon>
         </div>
         <div class="feature-content">
-          <h3>Financial Planning</h3>
-          <p>Expert insights to help manage your finances better</p>
+          <h3>Flexible Repayment</h3>
+          <p>Choose a repayment plan that works for you with customizable terms and options.</p>
         </div>
       </ion-card-content>
     </ion-card>
   </div>
+
+  <!-- How It Works Section -->
+  <div class="how-it-works-section ion-margin-top zungu-fade-in">
+    <h2 class="section-title emerald-accent">How It Works</h2>
+    
+    <div class="steps-container">
+      <ion-card class="step-card mint-background">
+        <ion-card-content>
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Register</h3>
+            <p>Create your account in less than 2 minutes</p>
+          </div>
+          <ion-icon name="person-add-outline" class="step-icon emerald-accent"></ion-icon>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="step-card mint-background">
+        <ion-card-content>
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Complete KYC</h3>
+            <p>Verify your identity with our secure system</p>
+          </div>
+          <ion-icon name="document-text-outline" class="step-icon emerald-accent"></ion-icon>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="step-card mint-background">
+        <ion-card-content>
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Apply for Loan</h3>
+            <p>Select your loan amount and terms</p>
+          </div>
+          <ion-icon name="wallet-outline" class="step-icon emerald-accent"></ion-icon>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="step-card mint-background">
+        <ion-card-content>
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Get Funded</h3>
+            <p>Receive money directly in your account</p>
+          </div>
+          <ion-icon name="cash-outline" class="step-icon emerald-accent"></ion-icon>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
 
   <!-- Status Section -->
   <ion-card class="status-card ion-margin-top emerald-border-left zungu-fade-in">
@@ -156,6 +209,14 @@
       </div>
     </ion-card-content>
   </ion-card>
+
+  <!-- Footer Section -->
+  <div class="footer-section ion-margin-top">
+    <div class="footer-content">
+      <p class="copyright">© 2025 Zungu Financial Solutions Management System. All rights reserved.</p>
+      <p class="designed-by">Designed by <span class="emerald-accent">SparkDev Studio</span></p>
+    </div>
+  </div>
 
   <!-- Login Card (Same structure, relabeled) -->
   <div class="login-card-container" [ngClass]="{'active': showLoginCard}">

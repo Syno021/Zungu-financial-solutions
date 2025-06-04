@@ -1,63 +1,31 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+/* Zungu Finance Solutions Theme */
+
 :root {
-  // Primary color - Emerald Green
-  --ion-color-primary: #2E7D32;
-  --ion-color-primary-rgb: 46, 125, 50;
+  // Primary brand colors
+  --ion-color-primary: #0D2B4F;   // Dark Navy Blue (used as background)
+  --ion-color-primary-rgb: 13, 43, 79;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #1B5E20;
-  --ion-color-primary-tint: #4C9A51;
-  
-  // Secondary color - Teal
-  --ion-color-secondary: #00897B;
-  --ion-color-secondary-rgb: 0, 137, 123;
+  --ion-color-primary-shade: #0b2545;
+  --ion-color-primary-tint: #264066;
+
+  --ion-color-secondary: #EF4F3D; // Coral Red
+  --ion-color-secondary-rgb: 239, 79, 61;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #00695C;
-  --ion-color-secondary-tint: #26A69A;
-  
-  // Success color - Emerald Green (same as primary)
-  --ion-color-success: #2E7D32;
-  --ion-color-success-rgb: 46, 125, 50;
-  --ion-color-success-contrast: #ffffff;
-  --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #1B5E20;
-  --ion-color-success-tint: #4C9A51;
-  
-  // Warning color - Golden Yellow
-  --ion-color-warning: #FFD54F;
-  --ion-color-warning-rgb: 255, 213, 79;
-  --ion-color-warning-contrast: #000000;
-  --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #FFC107;
-  --ion-color-warning-tint: #FFE082;
-  
-  // Danger color - Warm Red
-  --ion-color-danger: #D32F2F;
-  --ion-color-danger-rgb: 211, 47, 47;
-  --ion-color-danger-contrast: #ffffff;
-  --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #B71C1C;
-  --ion-color-danger-tint: #E57373;
-  
-  // Mint color (custom)
-  --ion-color-mint: #A5D6A7;
-  --ion-color-mint-rgb: 165, 214, 167;
-  --ion-color-mint-contrast: #000000;
-  --ion-color-mint-contrast-rgb: 0, 0, 0;
-  --ion-color-mint-shade: #81C784;
-  --ion-color-mint-tint: #C8E6C9;
-  
-  // Background color - subtle mint tint
-  --ion-background-color: #F5FAF6;
-  --ion-background-color-rgb: 245, 250, 246;
-  
-  // Card & Item variables
-  --ion-item-background: #ffffff;
-  --ion-card-background: #ffffff;
-  
-  // Border color
-  --ion-border-color: #81C784; // mint-dark
+  --ion-color-secondary-shade: #d54636;
+  --ion-color-secondary-tint: #f16252;
+
+  --ion-color-tertiary: #2EAD5F; // Fresh Green
+  --ion-color-tertiary-rgb: 46, 173, 95;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #289856;
+  --ion-color-tertiary-tint: #43b66f;
+
+  --ion-background-color: var(--ion-color-primary); // Set primary as background
+  --ion-text-color: #ffffff;
 }
-  
+
