@@ -11,8 +11,7 @@ export interface User {
     phoneNumber?: string;
     bankAccount?: string;
     kycDocs?: {
-      idDocUrl: string;
-      proofOfResidenceUrl: string;
+      id: string;
     };
     role: 'user' | 'admin';
     createdAt: Date;

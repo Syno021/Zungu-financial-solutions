@@ -174,8 +174,7 @@ export class RegisterPage implements OnInit {
         bankAccount: this.bankAccount.trim(),
         role: 'user', // Automatically set to 'user'
         kycDocs: {
-          idDocUrl: '',
-          proofOfResidenceUrl: ''
+          id: '',
         },
         createdAt: new Date(),
         updatedAt: new Date()
