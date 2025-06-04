@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'loans',
     loadChildren: () => import('./loans/loans.module').then( m => m.LoansPageModule)
   },
+  {
+    path: 'admin-loan-management',
+    loadChildren: () => import('./admin-loan-management/admin-loan-management.module').then( m => m.AdminLoanManagementPageModule)
+  },
 
   
 

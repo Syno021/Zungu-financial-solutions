@@ -20,9 +20,10 @@ import { FormsModule } from '@angular/forms';
 
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { HttpClientModule } from '@angular/common/http';
+import { KycDocumentsComponent } from './kyc-documents/kyc-documents.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, KycDocumentsComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),

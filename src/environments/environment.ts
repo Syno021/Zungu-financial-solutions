@@ -5,14 +5,13 @@
 export const environment = {
   production: false,
   firebaseConfig : {
-    
-
-    apiKey: "AIzaSyDC4aqShZ-kmHHh5bkEZw8o_2Lyat0r7Sw",
-  authDomain: "eventify-988ac.firebaseapp.com",
-  projectId: "eventify-988ac",
-  storageBucket: "eventify-988ac.appspot.com",
-  messagingSenderId: "594439083403",
-  appId: "1:594439083403:web:3e84976239fd3e9310cb8e"
+    apiKey: "AIzaSyAW1VvyNRUnY378b51Pu_ehaIWIu6D6LPY",
+    authDomain: "zungu-31c7c.firebaseapp.com",
+    projectId: "zungu-31c7c",
+    storageBucket: "zungu-31c7c.firebasestorage.app",
+    messagingSenderId: "810422375142",
+    appId: "1:810422375142:web:740176c2bcb97431716127",
+    measurementId: "G-YPH2ZHEFSC"
   }
 };
 

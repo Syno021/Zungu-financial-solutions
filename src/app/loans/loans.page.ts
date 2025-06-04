@@ -3,7 +3,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController, LoadingController, AlertController } from '@ionic/angular';
 import { Loan } from '../shared/models/loan.model'; // Assuming you have a Loan model defined
-
+import { User } from '../shared/models/user.model';
+import { KYC } from '../shared/models/kyc.model';
 
 export interface Payment {
   id: string;
@@ -37,9 +38,11 @@ export interface UserDoc {
 })
 export class LoansPage implements OnInit {
   isModalOpen = false;
+  isKycModalOpen = false;
   isSubmitting = false;
   estimatedRate = 0;
   currentUserDocId: string | null = null;
+  currentUser: User | null = null;
   isUserLoggedIn = false;
   
   loanApplication: LoanApplication = {
@@ -51,6 +54,12 @@ export class LoansPage implements OnInit {
     purpose: '',
     monthlyIncome: 0,
     additionalInfo: ''
+  };
+
+  // KYC document upload data
+  kycDocuments = {
+    idDocument: null as File | null,
+    proofOfResidence: null as File | null
   };
 
   // Interest rate ranges for different loan types
@@ -87,11 +96,13 @@ export class LoansPage implements OnInit {
       } else {
         this.isUserLoggedIn = false;
         this.currentUserDocId = null;
+        this.currentUser = null;
       }
     } catch (error) {
       console.error('Error checking authentication:', error);
       this.isUserLoggedIn = false;
       this.currentUserDocId = null;
+      this.currentUser = null;
     }
   }
 
@@ -105,14 +116,18 @@ export class LoansPage implements OnInit {
       if (userQuery && !userQuery.empty) {
         const userDoc = userQuery.docs[0];
         this.currentUserDocId = userDoc.id;
+        const userData = userDoc.data() || {};
+        this.currentUser = { id: userDoc.id, ...userData } as User & { id: string };
         console.log('User document ID found:', this.currentUserDocId);
       } else {
         console.log('No user document found for email:', userEmail);
         this.currentUserDocId = null;
+        this.currentUser = null;
       }
     } catch (error) {
       console.error('Error fetching user document ID:', error);
       this.currentUserDocId = null;
+      this.currentUser = null;
     }
   }
 
@@ -125,18 +140,37 @@ export class LoansPage implements OnInit {
       return;
     }
 
-    if (!this.currentUserDocId) {
+    if (!this.currentUserDocId || !this.currentUser) {
       await this.showAlert('User Profile Not Found', 'Unable to find your user profile. Please contact support.');
       return;
     }
 
+    // Check if user has KYC documents
+    if (!this.currentUser.kycDocs || !this.currentUser.kycDocs.id) {
+      // No KYC documents found, open KYC modal first
+      await this.showAlert('KYC Verification Required', 'Please complete your KYC verification before applying for a loan.');
+      this.openKycModal();
+      return;
+    }
+
+    // KYC documents exist, proceed with loan application
     this.isModalOpen = true;
     this.resetForm();
+  }
+
+  openKycModal() {
+    this.isKycModalOpen = true;
+    this.resetKycForm();
   }
 
   closeModal() {
     this.isModalOpen = false;
     this.resetForm();
+  }
+
+  closeKycModal() {
+    this.isKycModalOpen = false;
+    this.resetKycForm();
   }
 
   resetForm() {
@@ -151,6 +185,129 @@ export class LoansPage implements OnInit {
       additionalInfo: ''
     };
     this.estimatedRate = 0;
+  }
+
+  resetKycForm() {
+    this.kycDocuments = {
+      idDocument: null,
+      proofOfResidence: null
+    };
+  }
+
+  // Handle file selection for KYC documents
+  onFileSelected(event: any, documentType: 'idDocument' | 'proofOfResidence') {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        this.showToast('Please select a valid file type (JPEG, PNG, or PDF)', 'danger');
+        return;
+      }
+
+      if (file.size > maxSize) {
+        this.showToast('File size must be less than 5MB', 'danger');
+        return;
+      }
+
+      this.kycDocuments[documentType] = file;
+    }
+  }
+
+  async submitKycDocuments() {
+    try {
+      this.isSubmitting = true;
+
+      // Validate that both documents are selected
+      if (!this.kycDocuments.idDocument || !this.kycDocuments.proofOfResidence) {
+        await this.showToast('Please select both ID document and proof of residence', 'danger');
+        return;
+      }
+
+      if (!this.currentUserDocId) {
+        await this.showAlert('Error', 'User profile not found. Please try again.');
+        return;
+      }
+
+      const loading = await this.loadingController.create({
+        message: 'Uploading KYC documents...'
+      });
+      await loading.present();
+
+      // Create KYC document ID
+      const kycId = this.firestore.createId();
+      const now = new Date();
+
+      // Here you would typically upload files to Firebase Storage
+      // For this example, I'll simulate the upload URLs
+      // Replace this with actual file upload logic
+      const idDocumentUrl = await this.uploadFile(this.kycDocuments.idDocument, `kyc/${kycId}/id-document`);
+      const proofOfResidenceUrl = await this.uploadFile(this.kycDocuments.proofOfResidence, `kyc/${kycId}/proof-of-residence`);
+
+      // Create KYC document object
+      const kycDocument: KYC = {
+        id: kycId,
+        userId: this.currentUserDocId,
+        status: 'pending',
+        idDocument: {
+          url: idDocumentUrl
+        },
+        proofOfResidence: {
+          url: proofOfResidenceUrl
+        },
+        submittedAt: now,
+        updatedAt: now
+      };
+
+      // Save KYC document to firestore
+      await this.firestore.collection('kyc').doc(kycId).set(kycDocument);
+
+      // Update user document with KYC reference
+      await this.firestore.collection('users').doc(this.currentUserDocId).update({
+        kycDocs: { id: kycId },
+        updatedAt: now
+      });
+
+      // Update local user object
+      if (this.currentUser) {
+        this.currentUser.kycDocs = { id: kycId };
+      }
+
+      await loading.dismiss();
+
+      await this.showToast('KYC documents submitted successfully! You can now apply for a loan.', 'success');
+      
+      // Close KYC modal and open loan application modal
+      this.closeKycModal();
+      this.isModalOpen = true;
+      this.resetForm();
+
+    } catch (error) {
+      console.error('Error submitting KYC documents:', error);
+      await this.showToast('Error uploading documents. Please try again.', 'danger');
+    } finally {
+      this.isSubmitting = false;
+      const loading = await this.loadingController.getTop();
+      if (loading) {
+        await loading.dismiss();
+      }
+    }
+  }
+
+  // Placeholder for file upload function
+  private async uploadFile(file: File, path: string): Promise<string> {
+    // TODO: Implement actual file upload to Firebase Storage
+    // This is a placeholder that returns a dummy URL
+    // You'll need to implement the actual Firebase Storage upload logic
+    console.log(`Uploading file ${file.name} to path: ${path}`);
+    
+    // Simulate upload delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Return a placeholder URL - replace with actual upload implementation
+    return `https://example.com/${path}/${file.name}`;
   }
 
   updateEstimatedRate() {
