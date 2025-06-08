@@ -1,47 +1,61 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="main-header">
   <ion-toolbar class="ion-color-primary">
     <ion-buttons slot="start">
       <ion-button>
-        <ion-icon slot="icon-only" name="cash-outline"></ion-icon>
-        <img src="assets/logoIcon.png" alt="Zungu Logo">
+        <img src="assets/zungu-removebg-preview.png" alt="Zungu Logo" class="header-logo">
       </ion-button>
     </ion-buttons>
-    <ion-title>
-      Zungu Financial Solutions
+    
+    <ion-title class="ion-hide-md-up">
+      Zungu Financial
     </ion-title>
+
+    <ion-buttons slot="end" class="nav-buttons ion-hide-md-down">
+      <ion-button routerLink="/home" class="nav-link">
+        <ion-icon name="home-outline"></ion-icon>
+        Home
+      </ion-button>
+      <ion-button routerLink="/services" class="nav-link">
+        <ion-icon name="briefcase-outline"></ion-icon>
+        Services
+      </ion-button>
+      <ion-button routerLink="/about" class="nav-link">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        About
+      </ion-button>
+      <ion-button routerLink="/contact" class="nav-link">
+        <ion-icon name="mail-outline"></ion-icon>
+        Contact
+      </ion-button>
+      <ion-button (click)="toggleLoginCard()" class="login-button">
+        <ion-icon name="log-in-outline"></ion-icon>
+        Login
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" class="ion-hide-lg-up">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <!-- Hero Section -->
-  <div class="hero-container zungu-slide-up">
-    <h1 class="emerald-accent">Zungu Financial Solutions</h1>
+  <!-- Hero Section -->  <div class="hero-container zungu-slide-up">      <h1>      <span class="primary-text text-pattern">Zungu</span> 
+      <span class="secondary-text">Financial</span> 
+      <span class="tertiary-text">Solutions</span>
+    </h1>
     <h2 class="hero-subtitle">Simple, Fast, Reliable Loan Management</h2>
     <p>Get quick and easy loans after completing your KYC verification. Apply today and receive funds in your account within 24 hours.</p>
     
-    <ion-segment value="individual" class="user-type-segment ion-margin-vertical">
-      <ion-segment-button value="individual">
-        <ion-label>Individual</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="business">
-        <ion-label>Business</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="agent">
-        <ion-label>Agent</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+   
     
-    <ion-button class="button-primary ion-margin-bottom" expand="block" (click)="toggleLoginCard()">
-      Get Started
-      <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
-    </ion-button>
+    
   </div>
 
   <!-- Quick Actions -->
   <div class="quick-actions ion-margin-vertical zungu-fade-in">
     <ion-card class="action-card emerald-border-left">
-      <ion-card-content>
-        <ion-icon name="person-add-outline" class="emerald-accent"></ion-icon>
+      <ion-card-content>        <ion-icon name="person-add-outline" class="secondary-accent"></ion-icon>
         <div class="action-text">
           <h3>Apply for Loan</h3>
         </div>
@@ -50,7 +64,7 @@
 
     <ion-card class="action-card emerald-border-left">
       <ion-card-content>
-        <ion-icon name="document-text-outline" class="emerald-accent"></ion-icon>
+        <ion-icon name="document-text-outline" class="tertiary-accent"></ion-icon>
         <div class="action-text">
           <h3>Loan History</h3>
         </div>
@@ -59,7 +73,7 @@
 
     <ion-card class="action-card emerald-border-left">
       <ion-card-content>
-        <ion-icon name="card-outline" class="emerald-accent"></ion-icon>
+        <ion-icon name="card-outline" class="secondary-accent"></ion-icon>
         <div class="action-text">
           <h3>Make a Payment</h3>
         </div>
@@ -68,7 +82,7 @@
 
     <ion-card class="action-card emerald-border-left">
       <ion-card-content>
-        <ion-icon name="people-outline" class="emerald-accent"></ion-icon>
+        <ion-icon name="people-outline" class="tertiary-accent"></ion-icon>
         <div class="action-text">
           <h3>Refer a Client</h3>
         </div>
@@ -82,8 +96,7 @@
 
     <ion-card class="feature-card mint-background">
       <ion-card-content>
-        <div class="feature-icon-container">
-          <ion-icon name="shield-checkmark-outline" class="feature-icon emerald-accent"></ion-icon>
+        <div class="feature-icon-container">          <ion-icon name="shield-checkmark-outline" class="feature-icon secondary-accent"></ion-icon>
         </div>
         <div class="feature-content">
           <h3>Easy KYC Process</h3>
@@ -95,7 +108,7 @@
     <ion-card class="feature-card mint-background">
       <ion-card-content>
         <div class="feature-icon-container">
-          <ion-icon name="flash-outline" class="feature-icon emerald-accent"></ion-icon>
+          <ion-icon name="flash-outline" class="feature-icon tertiary-accent"></ion-icon>
         </div>
         <div class="feature-content">
           <h3>Quick Loan Approval</h3>
@@ -107,7 +120,7 @@
     <ion-card class="feature-card mint-background">
       <ion-card-content>
         <div class="feature-icon-container">
-          <ion-icon name="options-outline" class="feature-icon emerald-accent"></ion-icon>
+          <ion-icon name="options-outline" class="feature-icon secondary-accent"></ion-icon>
         </div>
         <div class="feature-content">
           <h3>Flexible Repayment</h3>
@@ -128,8 +141,7 @@
           <div class="step-content">
             <h3>Register</h3>
             <p>Create your account in less than 2 minutes</p>
-          </div>
-          <ion-icon name="person-add-outline" class="step-icon emerald-accent"></ion-icon>
+          </div>          <ion-icon name="person-add-outline" class="step-icon secondary-accent"></ion-icon>
         </ion-card-content>
       </ion-card>
 
@@ -140,7 +152,7 @@
             <h3>Complete KYC</h3>
             <p>Verify your identity with our secure system</p>
           </div>
-          <ion-icon name="document-text-outline" class="step-icon emerald-accent"></ion-icon>
+          <ion-icon name="document-text-outline" class="step-icon tertiary-accent"></ion-icon>
         </ion-card-content>
       </ion-card>
 
@@ -151,7 +163,7 @@
             <h3>Apply for Loan</h3>
             <p>Select your loan amount and terms</p>
           </div>
-          <ion-icon name="wallet-outline" class="step-icon emerald-accent"></ion-icon>
+          <ion-icon name="wallet-outline" class="step-icon secondary-accent"></ion-icon>
         </ion-card-content>
       </ion-card>
 
@@ -162,63 +174,160 @@
             <h3>Get Funded</h3>
             <p>Receive money directly in your account</p>
           </div>
-          <ion-icon name="cash-outline" class="step-icon emerald-accent"></ion-icon>
+          <ion-icon name="cash-outline" class="step-icon tertiary-accent"></ion-icon>
         </ion-card-content>
       </ion-card>
     </div>
   </div>
 
-
-  <!-- Status Section -->
-  <ion-card class="status-card ion-margin-top emerald-border-left zungu-fade-in">
-    <ion-card-header>
-      <ion-card-title>Platform Status</ion-card-title>
-      <ion-card-subtitle>All services operational</ion-card-subtitle>
-    </ion-card-header>
-    <ion-card-content>
-      <div class="status-item">
-        <div class="status-label">
-          <ion-icon name="shield-checkmark-outline" class="status-icon"></ion-icon>
-          <span>Security</span>
+  <!-- About Section -->
+  <div class="about-section ion-margin-top zungu-fade-in">
+    <h2 class="section-title emerald-accent">About Zungu Financial Solutions</h2>
+    <ion-card class="about-card mint-background">
+      <ion-card-content>
+        <div class="about-content">
+          <img src="assets/zungu-removebg-preview.png" alt="Zungu Logo" class="about-logo">
+          <p class="about-text">Zungu Financial Solutions is a leading financial services provider in KwaZulu-Natal, dedicated to empowering individuals and businesses with accessible lending solutions. Our mission is to bridge financial gaps and foster economic growth in our communities.</p>          <div class="about-stats">
+            <div class="stat-item">              <ion-icon name="trending-up-outline" class="stat-icon secondary-accent"></ion-icon>
+              <div class="stat-info">
+                <h3>98%</h3>
+                <p>Success Rate</p>
+              </div>
+            </div>
+            <div class="stat-item">
+              <ion-icon name="timer-outline" class="stat-icon tertiary-accent"></ion-icon>
+              <div class="stat-info">
+                <h3>24h</h3>
+                <p>Processing Time</p>
+              </div>
+            </div>
+            <div class="stat-item">
+              <ion-icon name="ribbon-outline" class="stat-icon secondary-accent"></ion-icon>
+              <div class="stat-info">
+                <h3>#1</h3>
+                <p>In KZN Region</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <ion-badge color="success">Secure</ion-badge>
-      </div>
-
-      <div class="status-item">
-        <div class="status-label">
-          <ion-icon name="server-outline" class="status-icon"></ion-icon>
-          <span>Database</span>
-        </div>
-        <ion-badge color="success">Online</ion-badge>
-      </div>
-
-      <div class="status-item">
-        <div class="status-label">
-          <ion-icon name="cloud-offline-outline" class="status-icon"></ion-icon>
-          <span>Offline Mode</span>
-        </div>
-        <ion-badge color="primary">Available</ion-badge>
-      </div>
-
-      <div class="status-item">
-        <div class="status-label">
-          <ion-icon name="notifications-outline" class="status-icon"></ion-icon>
-          <span>Notifications</span>
-        </div>
-        <ion-badge color="success">Enabled</ion-badge>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Footer Section -->
-  <div class="footer-section ion-margin-top">
-    <div class="footer-content">
-      <p class="copyright">© 2025 Zungu Financial Solutions Management System. All rights reserved.</p>
-      <p class="designed-by">Designed by <span class="emerald-accent">SparkDev Studio</span></p>
-    </div>
+      </ion-card-content>
+    </ion-card>
   </div>
 
-  <!-- Login Card (Same structure, relabeled) -->
+  <!-- Contact Section -->
+  <div class="contact-section ion-margin-top zungu-fade-in">
+    <h2 class="section-title emerald-accent">Contact Us</h2>
+    <div class="contact-container">
+      <ion-card class="contact-info-card mint-background">
+        <ion-card-content>
+          <h3 class="contact-subtitle">Get in Touch</h3>
+          <div class="contact-details">
+            <div class="contact-item">              <ion-icon name="location-outline" class="contact-icon secondary-accent"></ion-icon>
+              <div>
+                <h4>Address</h4>
+                <p>123 Smith Street, Durban Central, KZN 4001</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <ion-icon name="call-outline" class="contact-icon tertiary-accent"></ion-icon>
+              <div>
+                <h4>Phone</h4>
+                <p>+27 31 123 4567</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <ion-icon name="mail-outline" class="contact-icon secondary-accent"></ion-icon>              <div>
+                <h4>Email</h4>
+                <p>info&#64;zungufinance.co.za</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <ion-icon name="time-outline" class="contact-icon tertiary-accent"></ion-icon>
+              <div>
+                <h4>Business Hours</h4>
+                <p>Mon - Fri: 8:00 AM - 5:00 PM</p>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="map-card">
+        <ion-card-content>
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.11609823277!2d30.72929055!3d-29.85868!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1ef7aa0001bc61b7%3A0xcca75546c4aa6e81!2sDurban!5e0!3m2!1sen!2sza!4v1679900000000!5m2!1sen!2sza" 
+            width="100%" 
+            height="300" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+  <!-- Footer Section -->
+  <footer class="footer-section ion-margin-top">
+    <div class="footer-content">      <div class="footer-grid">
+        <div class="footer-column">
+          <img src="assets/zungu-removebg-preview.png" alt="Zungu Logo" class="footer-logo">
+          <h3 class="footer-title">About Us</h3>
+          <p class="footer-text">Leading financial services provider in KwaZulu-Natal, empowering communities through accessible lending solutions.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><ion-icon name="logo-facebook"></ion-icon></a>
+            <a href="#" class="social-link"><ion-icon name="logo-twitter"></ion-icon></a>
+            <a href="#" class="social-link"><ion-icon name="logo-linkedin"></ion-icon></a>
+            <a href="#" class="social-link"><ion-icon name="logo-instagram"></ion-icon></a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3 class="footer-title">Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/services">Services</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3 class="footer-title">Services</h3>
+          <ul class="footer-links">
+            <li><a href="#">Personal Loans</a></li>
+            <li><a href="#">Business Loans</a></li>
+            <li><a href="#">Investment Solutions</a></li>
+            <li><a href="#">Financial Advisory</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3 class="footer-title">Newsletter</h3>
+          <p class="footer-text">Subscribe to our newsletter for updates and financial tips.</p>
+          <div class="newsletter-form">
+            <input type="email" placeholder="Enter your email" class="newsletter-input">
+            <button class="newsletter-button">
+              <ion-icon name="paper-plane-outline"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div class="copyright">
+          <p>© 2025 Zungu Financial Solutions. All rights reserved.</p>
+        </div>
+        <div class="footer-info">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <span class="designed-by">Designed by <span class="emerald-accent">SparkDev Studio</span></span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Login Card(Same structure, relabeled) -->
   <div class="login-card-container" [ngClass]="{'active': showLoginCard}">
     <div class="login-backdrop" (click)="closeLoginCard()"></div>
 
@@ -237,9 +346,7 @@
           <div class="user-type-pill" [ngClass]="{'active': selectedUserType === 'individual'}" >Individual</div>
           <div class="user-type-pill" [ngClass]="{'active': selectedUserType === 'business'}" >Business</div>
           <div class="user-type-pill" [ngClass]="{'active': selectedUserType === 'agent'}" >Agent</div>
-        </div>
-
-        <form [formGroup]="loginForm" >
+        </div>        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
           <div class="form-group">
             <label for="email">Email Address</label>
             <input type="email" id="email" class="form-input" formControlName="email" placeholder="Enter your email">
@@ -263,10 +370,10 @@
               <input type="checkbox" id="remember" formControlName="rememberMe">
               <label for="remember">Remember me</label>
             </div>
-            <a href="javascript:void(0)" class="forgot-password" >Forgot password?</a>
+            <a href="javascript:void(0)" class="forgot-password" (click)="toggleResetPassword()">Forgot password?</a>
           </div>
 
-          <button type="submit" class="login-button" [disabled]="isLoading">
+          <button type="submit" class="login-button" [disabled]="isLoading || !loginForm.valid">
             <span *ngIf="!isLoading">Log in</span>
             <ion-spinner *ngIf="isLoading" name="circles" class="button-spinner"></ion-spinner>
             <ion-icon *ngIf="!isLoading" name="log-in-outline" class="button-icon"></ion-icon>
@@ -291,9 +398,7 @@
         </button>
       </div>
       <div class="login-card-content">
-        <p class="reset-instructions">Enter your email to receive a password reset link.</p>
-
-        <form [formGroup]="resetPasswordForm" >
+        <p class="reset-instructions">Enter your email to receive a password reset link.</p>        <form [formGroup]="resetPasswordForm" (ngSubmit)="onResetPassword()">
           <div class="form-group">
             <label for="reset-email">Email Address</label>
             <input type="email" id="reset-email" class="form-input" formControlName="email" placeholder="Enter your email">
@@ -303,9 +408,10 @@
             </div>
           </div>
 
-          <button type="submit" class="login-button">
-            Send Reset Link
-            <ion-icon name="send-outline" class="button-icon"></ion-icon>
+          <button type="submit" class="login-button" [disabled]="isLoading || !resetPasswordForm.valid">
+            <span *ngIf="!isLoading">Send Reset Link</span>
+            <ion-spinner *ngIf="isLoading" name="circles" class="button-spinner"></ion-spinner>
+            <ion-icon *ngIf="!isLoading" name="send-outline" class="button-icon"></ion-icon>
           </button>
 
           <button type="button" class="back-button" (click)="toggleResetPassword()">
