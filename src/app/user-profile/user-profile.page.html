@@ -1,0 +1,316 @@
+<!-- src/app/user-profile/user-profile.page.html -->
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>User Profile</ion-title>
+    <ion-buttons slot="end" *ngIf="user && !loading">
+      <ion-button (click)="toggleEditMode()" *ngIf="!editMode">
+        <ion-icon name="create-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="saveProfile()" *ngIf="editMode" color="primary">
+        <ion-icon name="checkmark-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="toggleEditMode()" *ngIf="editMode" color="medium">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">User Profile</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && user">
+    <!-- User Information Card -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Personal Information</ion-card-title>
+        <ion-card-subtitle>Your account details</ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <!-- Display Mode -->
+        <div *ngIf="!editMode">
+          <ion-item>
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Full Name</h3>
+              <p>{{ user.name }} {{ user.surname }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Email</h3>
+              <p>{{ user.email }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="user.gender">
+            <ion-icon name="transgender-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Gender</h3>
+              <p>{{ user.gender }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="user.phoneNumber">
+            <ion-icon name="call-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Phone Number</h3>
+              <p>{{ user.phoneNumber }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="user.idNumber">
+            <ion-icon name="card-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>ID Number</h3>
+              <p>{{ user.idNumber }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="user.bankAccount">
+            <ion-icon name="card-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Bank Account</h3>
+              <p>{{ user.bankAccount }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="shield-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Role</h3>
+              <p>{{ user.role | titlecase }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="time-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Member Since</h3>
+              <p>{{ formatDate(user.createdAt) }}</p>
+            </ion-label>
+          </ion-item>
+        </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="editMode">
+          <ion-item>
+            <ion-input 
+              label="First Name" 
+              labelPlacement="stacked"
+              [(ngModel)]="editForm.name"
+              placeholder="Enter your first name">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-input 
+              label="Last Name" 
+              labelPlacement="stacked"
+              [(ngModel)]="editForm.surname"
+              placeholder="Enter your last name">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-select 
+              label="Gender" 
+              labelPlacement="stacked"
+              [(ngModel)]="editForm.gender"
+              placeholder="Select gender">
+              <ion-select-option value="male">Male</ion-select-option>
+              <ion-select-option value="female">Female</ion-select-option>
+              <ion-select-option value="other">Other</ion-select-option>
+              <ion-select-option value="prefer-not-to-say">Prefer not to say</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-input 
+              label="Phone Number" 
+              labelPlacement="stacked"
+              [(ngModel)]="editForm.phoneNumber"
+              placeholder="Enter your phone number"
+              type="tel">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-input 
+              label="Bank Account" 
+              labelPlacement="stacked"
+              [(ngModel)]="editForm.bankAccount"
+              placeholder="Enter your bank account number">
+            </ion-input>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- KYC Status Card -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="document-text-outline"></ion-icon>
+          KYC Verification
+        </ion-card-title>
+        <ion-card-subtitle>Know Your Customer verification status</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-item button (click)="showKycDetails()" *ngIf="kyc">
+          <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Verification Status</h3>
+            <p>
+              <ion-chip [color]="getKycStatusColor()">
+                <ion-label>{{ getKycStatusText() }}</ion-label>
+              </ion-chip>
+            </p>
+          </ion-label>
+          <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+        </ion-item>
+
+        <ion-item *ngIf="!kyc">
+          <ion-icon name="alert-circle-outline" slot="start" color="warning"></ion-icon>
+          <ion-label>
+            <h3>No KYC Submitted</h3>
+            <p>Complete your KYC verification to unlock all features</p>
+          </ion-label>
+        </ion-item>
+
+        <!-- KYC Details -->
+        <div *ngIf="kyc">
+          <ion-item>
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Submitted</h3>
+              <p>{{ formatDate(kyc.submittedAt) }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h3>Last Updated</h3>
+              <p>{{ formatDate(kyc.updatedAt) }}</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- Document Status Items -->
+          <ion-item *ngIf="kyc.status === 'verified' && kyc.idDocument" button (click)="viewDocument(kyc.idDocument.url, 'ID Document')">
+            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>ID Document</h3>
+              <p>Verified {{ kyc.idDocument.verifiedAt ? 'on ' + formatDate(kyc.idDocument.verifiedAt) : '' }}</p>
+            </ion-label>
+            <ion-icon name="eye-outline" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item *ngIf="kyc.status === 'verified' && kyc.proofOfResidence" button (click)="viewDocument(kyc.proofOfResidence.url, 'Proof of Residence')">
+            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>Proof of Residence</h3>
+              <p>Verified {{ kyc.proofOfResidence.verifiedAt ? 'on ' + formatDate(kyc.proofOfResidence.verifiedAt) : '' }}</p>
+            </ion-label>
+            <ion-icon name="eye-outline" slot="end"></ion-icon>
+          </ion-item>
+
+          <!-- Pending documents -->
+          <ion-item *ngIf="kyc.status === 'pending' && kyc.idDocument" button (click)="viewDocument(kyc.idDocument.url, 'ID Document')">
+            <ion-icon name="time-outline" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h3>ID Document</h3>
+              <p>Under Review</p>
+            </ion-label>
+            <ion-icon name="eye-outline" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item *ngIf="kyc.status === 'pending' && kyc.proofOfResidence" button (click)="viewDocument(kyc.proofOfResidence.url, 'Proof of Residence')">
+            <ion-icon name="time-outline" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h3>Proof of Residence</h3>
+              <p>Under Review</p>
+            </ion-label>
+            <ion-icon name="eye-outline" slot="end"></ion-icon>
+          </ion-item>
+
+          <!-- Rejected documents -->
+          <ion-item *ngIf="kyc.status === 'rejected' && kyc.idDocument" button (click)="viewDocument(kyc.idDocument.url, 'ID Document')">
+            <ion-icon name="close-circle-outline" slot="start" color="danger"></ion-icon>
+            <ion-label>
+              <h3>ID Document</h3>
+              <p>Rejected</p>
+            </ion-label>
+            <ion-icon name="eye-outline" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item *ngIf="kyc.status === 'rejected' && kyc.proofOfResidence" button (click)="viewDocument(kyc.proofOfResidence.url, 'Proof of Residence')">
+            <ion-icon name="close-circle-outline" slot="start" color="danger"></ion-icon>
+            <ion-label>
+              <h3>Proof of Residence</h3>
+              <p>Rejected</p>
+            </ion-label>
+            <ion-icon name="eye-outline" slot="end"></ion-icon>
+          </ion-item>
+
+          <ion-item *ngIf="kyc.status === 'rejected' && kyc.rejectionReason">
+            <ion-icon name="information-circle-outline" slot="start" color="danger"></ion-icon>
+            <ion-label>
+              <h3>Rejection Reason</h3>
+              <p>{{ kyc.rejectionReason }}</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- View Documents Button -->
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            color="primary"
+            class="ion-margin-top"
+            (click)="viewKycDocuments()" 
+            *ngIf="kyc && (kyc.idDocument || kyc.proofOfResidence)">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            View All Documents
+          </ion-button>
+        </div>
+
+        <!-- Action Button -->
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          *ngIf="!kyc || kyc.status === 'rejected'"
+          class="ion-margin-top"
+          (click)="submitKycDocuments()">
+          <ion-icon name="document-attach-outline" slot="start"></ion-icon>
+          {{ !kyc ? 'Submit KYC Documents' : 'Resubmit KYC Documents' }}
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- No User State -->
+  <div *ngIf="!loading && !user" class="error-container">
+    <ion-icon name="person-outline" size="large"></ion-icon>
+    <h2>No User Data</h2>
+    <p>Unable to load user profile information.</p>
+    <ion-button (click)="loadUserProfile()" color="primary">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Retry
+    </ion-button>
+  </div>
+</ion-content>

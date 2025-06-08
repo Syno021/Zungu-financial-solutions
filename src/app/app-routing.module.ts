@@ -23,6 +23,10 @@ const routes: Routes = [
     path: 'admin-loan-management',
     loadChildren: () => import('./admin-loan-management/admin-loan-management.module').then( m => m.AdminLoanManagementPageModule)
   },
+  {
+    path: 'user-profile',
+    loadChildren: () => import('./user-profile/user-profile.module').then( m => m.UserProfilePageModule)
+  },
 
   
 

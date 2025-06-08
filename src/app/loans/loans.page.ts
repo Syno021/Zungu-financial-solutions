@@ -298,17 +298,22 @@ export class LoansPage implements OnInit {
 
   // Placeholder for file upload function
   private async uploadFile(file: File, path: string): Promise<string> {
-    // TODO: Implement actual file upload to Firebase Storage
-    // This is a placeholder that returns a dummy URL
-    // You'll need to implement the actual Firebase Storage upload logic
-    console.log(`Uploading file ${file.name} to path: ${path}`);
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
     
-    // Simulate upload delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    reader.onload = () => {
+      const base64String = reader.result as string;
+      // Return the base64 string which will be stored directly in Firestore
+      resolve(base64String);
+    };
     
-    // Return a placeholder URL - replace with actual upload implementation
-    return `https://example.com/${path}/${file.name}`;
-  }
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+    
+    reader.readAsDataURL(file);
+  });
+}
 
   updateEstimatedRate() {
     if (this.loanApplication.purpose && this.loanApplication.amount > 0) {
