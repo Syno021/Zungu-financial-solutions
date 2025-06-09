@@ -1,0 +1,176 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>KYC Administration</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">KYC Administration</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-container">
+    <ion-searchbar 
+      [(ngModel)]="searchTerm"
+      (ionInput)="onSearchChange($event)"
+      (ionClear)="resetFilters()"
+      placeholder="Search by name, email, or ID..."
+      show-clear-button="focus">
+    </ion-searchbar>
+    
+    <ion-item lines="none" class="filter-item">
+      <ion-label>Filter by Status:</ion-label>
+      <ion-select 
+        [(ngModel)]="selectedStatus"
+        (ionSelectionChange)="onStatusChange($event)"
+        interface="popover"
+        placeholder="All Status">
+        <ion-select-option 
+          *ngFor="let option of statusOptions" 
+          [value]="option.value">
+          {{ option.label }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </div>
+
+  <!-- Stats Summary -->
+  <div class="stats-container">
+    <div class="stat-card pending">
+      <ion-icon name="time-outline"></ion-icon>
+      <div class="stat-info">
+        <h3>{{ getPendingCount() }}</h3>
+        <p>Pending</p>
+      </div>
+    </div>
+    <div class="stat-card verified">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      <div class="stat-info">
+        <h3>{{ getVerifiedCount() }}</h3>
+        <p>Verified</p>
+      </div>
+    </div>
+    <div class="stat-card rejected">
+      <ion-icon name="close-circle-outline"></ion-icon>
+      <div class="stat-info">
+        <h3>{{ getRejectedCount() }}</h3>
+        <p>Rejected</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading KYC applications...</p>
+  </div>
+
+  <!-- KYC Applications Grid -->
+  <div *ngIf="!loading" class="kyc-grid">
+    <ion-card 
+      *ngFor="let kyc of filteredApplications; trackBy: trackByKycId" 
+      class="kyc-card"
+      [class.pending]="kyc.status === 'pending'"
+      [class.verified]="kyc.status === 'verified'"
+      [class.rejected]="kyc.status === 'rejected'">
+      
+      <!-- Card Header -->
+      <ion-card-header>
+        <div class="card-header-content">
+          <div class="user-info">
+            <div class="avatar">
+              <ion-icon name="person"></ion-icon>
+            </div>
+            <div class="user-details">
+              <ion-card-title>
+                {{ kyc.user?.name || 'Unknown' }} {{ kyc.user?.surname || 'User' }}
+              </ion-card-title>
+              <ion-card-subtitle>{{ kyc.user?.email || 'No email' }}</ion-card-subtitle>
+            </div>
+          </div>
+          <ion-chip [color]="getStatusColor(kyc.status)" class="status-chip">
+            <ion-icon [name]="getStatusIcon(kyc.status)"></ion-icon>
+            <ion-label>{{ kyc.status | titlecase }}</ion-label>
+          </ion-chip>
+        </div>
+      </ion-card-header>
+
+      <!-- Card Content -->
+      <ion-card-content>
+        <div class="kyc-details">
+          <div class="detail-row">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Submitted: {{ formatDate(kyc.submittedAt) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="kyc.updatedAt">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>Updated: {{ formatDate(kyc.updatedAt) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="kyc.rejectionReason">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span class="rejection-reason">{{ kyc.rejectionReason }}</span>
+          </div>
+        </div>
+
+        <!-- Document Actions -->
+        <div class="document-actions">
+          <ion-button 
+            fill="outline" 
+            size="small"
+            (click)="viewDocument(kyc.idDocument.url, 'ID Document')"
+            class="doc-button">
+            <ion-icon name="card-outline" slot="start"></ion-icon>
+            ID Document
+          </ion-button>
+          <ion-button 
+            fill="outline" 
+            size="small"
+            (click)="viewDocument(kyc.proofOfResidence.url, 'Proof of Residence')"
+            class="doc-button">
+            <ion-icon name="home-outline" slot="start"></ion-icon>
+            Proof of Residence
+          </ion-button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" *ngIf="kyc.status === 'pending'">
+          <ion-button 
+            color="success" 
+            fill="solid"
+            size="small"
+            (click)="updateKycStatus(kyc, 'verified')"
+            class="action-btn">
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+            Verify
+          </ion-button>
+          <ion-button 
+            color="danger" 
+            fill="solid"
+            size="small"
+            (click)="updateKycStatus(kyc, 'rejected')"
+            class="action-btn">
+            <ion-icon name="close" slot="start"></ion-icon>
+            Reject
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredApplications.length === 0" class="empty-state">
+    <ion-icon name="document-text-outline" size="large"></ion-icon>
+    <h3>No KYC Applications Found</h3>
+    <p>{{ searchTerm || selectedStatus !== 'all' ? 'Try adjusting your search or filter criteria.' : 'No applications have been submitted yet.' }}</p>
+  </div>
+
+  <!-- Refresh Button -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="loadKycApplications()">
+      <ion-icon name="refresh"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

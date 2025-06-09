@@ -298,22 +298,22 @@ export class LoansPage implements OnInit {
 
   // Placeholder for file upload function
   private async uploadFile(file: File, path: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    
-    reader.onload = () => {
-      const base64String = reader.result as string;
-      // Return the base64 string which will be stored directly in Firestore
-      resolve(base64String);
-    };
-    
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-    
-    reader.readAsDataURL(file);
-  });
-}
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        // Return the base64 string which will be stored directly in Firestore
+        resolve(base64String);
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+      
+      reader.readAsDataURL(file);
+    });
+  }
 
   updateEstimatedRate() {
     if (this.loanApplication.purpose && this.loanApplication.amount > 0) {

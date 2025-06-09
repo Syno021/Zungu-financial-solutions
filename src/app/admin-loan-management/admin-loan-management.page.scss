@@ -1,0 +1,261 @@
+/* Global Styles */
+
+
+/* Segment Styling */
+.segment-container {
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.custom-segment {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-segment ion-segment-button {
+  --border-radius: 12px;
+  margin: 0 4px;
+}
+
+.custom-segment ion-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.custom-segment ion-icon {
+  font-size: 20px;
+}
+
+/* Search and Filter Container */
+.search-filter-container {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  align-items: center;
+}
+
+.custom-searchbar {
+  flex: 1;
+}
+
+.status-filter {
+  max-width: 150px;
+}
+
+/* View Container */
+.view-container {
+  padding-bottom: 20px;
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 16px;
+  padding: 0 16px;
+}
+
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .search-filter-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card Styling */
+.application-card,
+.loan-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.application-card:hover,
+.loan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Header */
+.card-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+ion-card-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+ion-card-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6c757d;
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
+
+ion-card-subtitle ion-icon {
+  font-size: 16px;
+}
+
+.status-badge {
+  font-size: 0.8em;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 4px 12px;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.info-item ion-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.info-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item .label {
+  font-size: 0.75em;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item .value {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Purpose Section */
+.purpose-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  border-left: 4px solid var(--ion-color-primary);
+}
+
+.purpose-section ion-icon {
+  font-size: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.purpose-section .label {
+  font-size: 0.75em;
+  color: #1976d2;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.purpose-text {
+  font-size: 0.9em;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+/* Card Actions */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.action-button {
+  flex: 1;
+  --border-radius: 8px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  margin: 40px 16px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state ion-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1.3em;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-actions {
+    flex-direction: column;
+  }
+  
+  .action-button {
+    width: 100%;
+  }
+}

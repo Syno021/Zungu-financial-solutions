@@ -21,9 +21,11 @@ import { FormsModule } from '@angular/forms';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { KycDocumentsComponent } from './kyc-documents/kyc-documents.component';
+import { PdfViewerModalComponent } from './user-profile/user-profile.page';
+import { AdminPdfViewerModalComponent } from './admin-kyc/admin-kyc.page';
 
 @NgModule({
-  declarations: [AppComponent, KycDocumentsComponent],
+  declarations: [AppComponent, KycDocumentsComponent, PdfViewerModalComponent, AdminPdfViewerModalComponent],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),

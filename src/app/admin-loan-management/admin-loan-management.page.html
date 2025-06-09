@@ -1,10 +1,10 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>Admin Loan Management</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="loan-management-content">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Admin Loan Management</ion-title>
@@ -12,132 +12,301 @@
   </ion-header>
 
   <!-- View Toggle -->
-  <ion-segment [(ngModel)]="currentView" color="primary">
-    <ion-segment-button value="applications">
-      <ion-label>Loan Applications</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="loans">
-      <ion-label>Loans</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <div class="segment-container">
+    <ion-segment [(ngModel)]="currentView" color="primary" class="custom-segment">
+      <ion-segment-button value="applications">
+        <ion-label>
+          <ion-icon name="document-text"></ion-icon>
+          Loan Applications
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="loans">
+        <ion-label>
+          <ion-icon name="card"></ion-icon>
+          Active Loans
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
 
   <!-- Loan Applications View -->
-  <div *ngIf="currentView === 'applications'">
-    <ion-toolbar>
-      <ion-title size="small">Loan Applications</ion-title>
-      <ion-buttons slot="end">
-        <ion-select [(ngModel)]="applicationStatusFilter" (ionChange)="onApplicationFilterChange()" interface="popover">
-          <ion-select-option value="all">All Status</ion-select-option>
-          <ion-select-option value="pending">Pending</ion-select-option>
-          <ion-select-option value="approved">Approved</ion-select-option>
-          <ion-select-option value="rejected">Rejected</ion-select-option>
-          <ion-select-option value="active">Active</ion-select-option>
-          <ion-select-option value="completed">Completed</ion-select-option>
-          <ion-select-option value="defaulted">Defaulted</ion-select-option>
-        </ion-select>
-      </ion-buttons>
-    </ion-toolbar>
+  <div *ngIf="currentView === 'applications'" class="view-container">
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-container">
+      <ion-searchbar 
+        [(ngModel)]="applicationSearchTerm"
+        (ionInput)="onApplicationSearch()"
+        placeholder="Search applications by name, email, or phone"
+        show-clear-button="focus"
+        class="custom-searchbar">
+      </ion-searchbar>
+      
+      <ion-select 
+        [(ngModel)]="applicationStatusFilter" 
+        (ionChange)="onApplicationFilterChange()" 
+        interface="popover"
+        placeholder="Filter by Status"
+        class="status-filter">
+        <ion-select-option value="all">All Status</ion-select-option>
+        <ion-select-option value="pending">Pending</ion-select-option>
+        <ion-select-option value="approved">Approved</ion-select-option>
+        <ion-select-option value="rejected">Rejected</ion-select-option>
+        <ion-select-option value="active">Active</ion-select-option>
+        <ion-select-option value="completed">Completed</ion-select-option>
+        <ion-select-option value="defaulted">Defaulted</ion-select-option>
+      </ion-select>
+    </div>
 
-    <ion-list>
-      <ion-item *ngFor="let application of filteredApplications">
-        <ion-label>
-          <h2>{{ application.fullName }}</h2>
-          <p>{{ application.email }} | {{ application.phone }}</p>
-          <p>Amount: {{ formatCurrency(application.amount) }}</p>
-          <p>Purpose: {{ application.purpose }}</p>
-          <p>Term: {{ application.term }} months</p>
-          <p>Interest Rate: {{ application.interestRate }}%</p>
-          <p>Monthly Income: {{ formatCurrency(application.monthlyIncome) }}</p>
-          <p>Applied: {{ formatDate(application.createdAt) }}</p>
-          <p>Monthly Payment: {{ formatCurrency(getMonthlyPayment(application)) }}</p>
-          <ion-badge 
-            [color]="application.status === 'pending' ? 'warning' : 
-                     application.status === 'approved' ? 'success' : 
-                     application.status === 'active' ? 'primary' :
-                     application.status === 'completed' ? 'medium' :
-                     'danger'">
-            {{ application.status | titlecase }}
-          </ion-badge>
-        </ion-label>
-        
-        <ion-buttons slot="end" *ngIf="application.status === 'pending'">
+    <!-- Applications Grid -->
+    <div class="cards-grid" *ngIf="filteredApplications.length > 0">
+      <ion-card *ngFor="let application of filteredApplications" class="application-card">
+        <ion-card-header>
+          <div class="card-header-content">
+            <ion-card-title>{{ application.fullName }}</ion-card-title>
+            <ion-badge 
+              [color]="application.status === 'pending' ? 'warning' : 
+                       application.status === 'approved' ? 'success' : 
+                       application.status === 'active' ? 'primary' :
+                       application.status === 'completed' ? 'medium' :
+                       'danger'"
+              class="status-badge">
+              {{ application.status | titlecase }}
+            </ion-badge>
+          </div>
+          <ion-card-subtitle>
+            <ion-icon name="mail"></ion-icon> {{ application.email }}
+          </ion-card-subtitle>
+          <ion-card-subtitle>
+            <ion-icon name="call"></ion-icon> {{ application.phone }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <ion-icon name="cash" color="primary"></ion-icon>
+              <div>
+                <span class="label">Amount</span>
+                <span class="value">{{ formatCurrency(application.amount) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="calendar" color="primary"></ion-icon>
+              <div>
+                <span class="label">Term</span>
+                <span class="value">{{ application.term }} months</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="trending-up" color="primary"></ion-icon>
+              <div>
+                <span class="label">Interest Rate</span>
+                <span class="value">{{ application.interestRate }}%</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="wallet" color="primary"></ion-icon>
+              <div>
+                <span class="label">Monthly Income</span>
+                <span class="value">{{ formatCurrency(application.monthlyIncome) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="receipt" color="primary"></ion-icon>
+              <div>
+                <span class="label">Monthly Payment</span>
+                <span class="value">{{ formatCurrency(getMonthlyPayment(application)) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="time" color="primary"></ion-icon>
+              <div>
+                <span class="label">Applied</span>
+                <span class="value">{{ formatDate(application.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="purpose-section">
+            <ion-icon name="clipboard" color="primary"></ion-icon>
+            <div>
+              <span class="label">Purpose</span>
+              <span class="purpose-text">{{ application.purpose }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+
+        <div class="card-actions" *ngIf="application.status === 'pending'">
           <ion-button 
             fill="solid" 
             color="success" 
             size="small"
-            (click)="approveApplication(application)">
-            <ion-icon name="checkmark" slot="icon-only"></ion-icon>
+            (click)="approveApplication(application)"
+            class="action-button">
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+            Approve
           </ion-button>
           <ion-button 
-            fill="solid" 
+            fill="outline" 
             color="danger" 
             size="small"
-            (click)="rejectApplication(application)">
-            <ion-icon name="close" slot="icon-only"></ion-icon>
+            (click)="rejectApplication(application)"
+            class="action-button">
+            <ion-icon name="close" slot="start"></ion-icon>
+            Reject
           </ion-button>
-        </ion-buttons>
-      </ion-item>
-    </ion-list>
+        </div>
+      </ion-card>
+    </div>
 
-    <ion-item *ngIf="filteredApplications.length === 0">
-      <ion-label>
-        <p>No loan applications found.</p>
-      </ion-label>
-    </ion-item>
+    <!-- No Applications Message -->
+    <div *ngIf="filteredApplications.length === 0" class="empty-state">
+      <ion-icon name="document-text" size="large" color="medium"></ion-icon>
+      <h2>No Applications Found</h2>
+      <p>No loan applications match your current search and filter criteria.</p>
+    </div>
   </div>
 
   <!-- Loans View -->
-  <div *ngIf="currentView === 'loans'">
-    <ion-toolbar>
-      <ion-title size="small">Loan Management</ion-title>
-      <ion-buttons slot="end">
-        <ion-select [(ngModel)]="loanStatusFilter" (ionChange)="onLoanFilterChange()" interface="popover">
-          <ion-select-option value="all">All Status</ion-select-option>
-          <ion-select-option value="pending">Pending</ion-select-option>
-          <ion-select-option value="approved">Approved</ion-select-option>
-          <ion-select-option value="rejected">Rejected</ion-select-option>
-          <ion-select-option value="active">Active</ion-select-option>
-          <ion-select-option value="completed">Completed</ion-select-option>
-          <ion-select-option value="defaulted">Defaulted</ion-select-option>
-        </ion-select>
-      </ion-buttons>
-    </ion-toolbar>
+  <div *ngIf="currentView === 'loans'" class="view-container">
+    <!-- Search and Filter Bar -->
+    <div class="search-filter-container">
+      <ion-searchbar 
+        [(ngModel)]="loanSearchTerm"
+        (ionInput)="onLoanSearch()"
+        placeholder="Search loans by ID, User ID, or purpose"
+        show-clear-button="focus"
+        class="custom-searchbar">
+      </ion-searchbar>
+      
+      <ion-select 
+        [(ngModel)]="loanStatusFilter" 
+        (ionChange)="onLoanFilterChange()" 
+        interface="popover"
+        placeholder="Filter by Status"
+        class="status-filter">
+        <ion-select-option value="all">All Status</ion-select-option>
+        <ion-select-option value="pending">Pending</ion-select-option>
+        <ion-select-option value="approved">Approved</ion-select-option>
+        <ion-select-option value="rejected">Rejected</ion-select-option>
+        <ion-select-option value="active">Active</ion-select-option>
+        <ion-select-option value="completed">Completed</ion-select-option>
+        <ion-select-option value="defaulted">Defaulted</ion-select-option>
+      </ion-select>
+    </div>
 
-    <ion-list>
-      <ion-item *ngFor="let loan of filteredLoans">
-        <ion-label>
-          <h2>User ID: {{ loan.userId }}</h2>
-          <p>Loan ID: {{ loan.id }}</p>
-          <p>Loan Amount: {{ formatCurrency(loan.amount) }}</p>
-          <p>Interest Rate: {{ loan.interestRate }}%</p>
-          <p>Term: {{ loan.term }} months</p>
-          <p>Purpose: {{ loan.purpose }}</p>
-          <p>Monthly Payment: {{ formatCurrency(getMonthlyPayment(loan)) }}</p>
-          <p>Created: {{ formatDate(loan.createdAt) }}</p>
-          <p *ngIf="loan.startDate">Start Date: {{ formatDate(loan.startDate) }}</p>
-          <p *ngIf="loan.endDate">End Date: {{ formatDate(loan.endDate) }}</p>
-          <p *ngIf="loan.approvedAt">Approved: {{ formatDate(loan.approvedAt) }}</p>
-          <p>Last Updated: {{ formatDate(loan.updatedAt) }}</p>
-          <p>Payments: {{ loan.payments.length }} payment(s) recorded</p>
-          <ion-badge 
-            [color]="loan.status === 'pending' ? 'warning' : 
-                     loan.status === 'approved' ? 'success' : 
-                     loan.status === 'active' ? 'primary' : 
-                     loan.status === 'completed' ? 'medium' : 'danger'">
-            {{ loan.status | titlecase }}
-          </ion-badge>
-        </ion-label>
-        
-        <!-- Action buttons based on loan status -->
-        <ion-buttons slot="end">
+    <!-- Loans Grid -->
+    <div class="cards-grid" *ngIf="filteredLoans.length > 0">
+      <ion-card *ngFor="let loan of filteredLoans" class="loan-card">
+        <ion-card-header>
+          <div class="card-header-content">
+            <ion-card-title>Loan #{{ loan.id }}</ion-card-title>
+            <ion-badge 
+              [color]="loan.status === 'pending' ? 'warning' : 
+                       loan.status === 'approved' ? 'success' : 
+                       loan.status === 'active' ? 'primary' : 
+                       loan.status === 'completed' ? 'medium' : 'danger'"
+              class="status-badge">
+              {{ loan.status | titlecase }}
+            </ion-badge>
+          </div>
+          <ion-card-subtitle>
+            <ion-icon name="person"></ion-icon> User ID: {{ loan.userId }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <ion-icon name="cash" color="primary"></ion-icon>
+              <div>
+                <span class="label">Loan Amount</span>
+                <span class="value">{{ formatCurrency(loan.amount) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="trending-up" color="primary"></ion-icon>
+              <div>
+                <span class="label">Interest Rate</span>
+                <span class="value">{{ loan.interestRate }}%</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="calendar" color="primary"></ion-icon>
+              <div>
+                <span class="label">Term</span>
+                <span class="value">{{ loan.term }} months</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="receipt" color="primary"></ion-icon>
+              <div>
+                <span class="label">Monthly Payment</span>
+                <span class="value">{{ formatCurrency(getMonthlyPayment(loan)) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="time" color="primary"></ion-icon>
+              <div>
+                <span class="label">Created</span>
+                <span class="value">{{ formatDate(loan.createdAt) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item" *ngIf="loan.startDate">
+              <ion-icon name="play" color="primary"></ion-icon>
+              <div>
+                <span class="label">Start Date</span>
+                <span class="value">{{ formatDate(loan.startDate) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item" *ngIf="loan.endDate">
+              <ion-icon name="flag" color="primary"></ion-icon>
+              <div>
+                <span class="label">End Date</span>
+                <span class="value">{{ formatDate(loan.endDate) }}</span>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <ion-icon name="card" color="primary"></ion-icon>
+              <div>
+                <span class="label">Payments</span>
+                <span class="value">{{ loan.payments.length }} recorded</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="purpose-section">
+            <ion-icon name="clipboard" color="primary"></ion-icon>
+            <div>
+              <span class="label">Purpose</span>
+              <span class="purpose-text">{{ loan.purpose }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+
+        <div class="card-actions">
           <!-- For approved loans - allow activation -->
           <ion-button 
             *ngIf="loan.status === 'approved'"
             fill="solid" 
             color="primary" 
             size="small"
-            (click)="activateLoan(loan)">
-            <ion-icon name="play" slot="icon-only"></ion-icon>
+            (click)="activateLoan(loan)"
+            class="action-button">
+            <ion-icon name="play" slot="start"></ion-icon>
+            Activate
           </ion-button>
           
           <!-- For active loans - allow completion or default -->
@@ -146,26 +315,32 @@
             fill="solid" 
             color="success" 
             size="small"
-            (click)="completeLoan(loan)">
-            <ion-icon name="checkmark-done" slot="icon-only"></ion-icon>
+            (click)="completeLoan(loan)"
+            class="action-button">
+            <ion-icon name="checkmark-done" slot="start"></ion-icon>
+            Complete
           </ion-button>
           
           <ion-button 
             *ngIf="loan.status === 'active'"
-            fill="solid" 
+            fill="outline" 
             color="danger" 
             size="small"
-            (click)="defaultLoan(loan)">
-            <ion-icon name="warning" slot="icon-only"></ion-icon>
+            (click)="defaultLoan(loan)"
+            class="action-button">
+            <ion-icon name="warning" slot="start"></ion-icon>
+            Default
           </ion-button>
-        </ion-buttons>
-      </ion-item>
-    </ion-list>
+        </div>
+      </ion-card>
+    </div>
 
-    <ion-item *ngIf="filteredLoans.length === 0">
-      <ion-label>
-        <p>No loans found.</p>
-      </ion-label>
-    </ion-item>
+    <!-- No Loans Message -->
+    <div *ngIf="filteredLoans.length === 0" class="empty-state">
+      <ion-icon name="card" size="large" color="medium"></ion-icon>
+      <h2>No Loans Found</h2>
+      <p>No loans match your current search and filter criteria.</p>
+    </div>
   </div>
 </ion-content>
+

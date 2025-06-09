@@ -1,7 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { ToastController, AlertController, LoadingController } from '@ionic/angular';
+import { map, switchMap } from 'rxjs/operators';
+
+// KYC Interface
+export interface KYC {
+  id: string;
+  userId: string;
+  status: 'pending' | 'approved' | 'rejected' | 'verified';
+  fullName: string;
+  email: string;
+  phone: string;
+  idNumber: string;
+  address: string;
+  documents: {
+    idDocument?: string;
+    proofOfAddress?: string;
+    proofOfIncome?: string;
+  };
+  submittedAt: Date;
+  reviewedAt?: Date;
+  reviewedBy?: string;
+  verifiedAt?: Date;
+  verifiedBy?: string;
+  rejectionReason?: string;
+}
 
 // Updated interfaces to match your actual data structure
 export interface Payment {
@@ -48,6 +72,9 @@ export interface LoanApplication {
   payments: Payment[];
   createdAt: Date;
   updatedAt: Date;
+  // KYC verification status
+  kycStatus?: 'pending' | 'approved' | 'rejected' | 'verified';
+  kycVerifiedAt?: Date;
 }
 
 @Component({
@@ -60,13 +87,22 @@ export class AdminLoanManagementPage implements OnInit {
   currentView: 'applications' | 'loans' = 'applications';
   loanApplications$!: Observable<LoanApplication[]>;
   loans$!: Observable<Loan[]>;
+  kycRecords$!: Observable<KYC[]>;
   
+  // Original data arrays
+  allApplications: LoanApplication[] = [];
+  allLoans: Loan[] = [];
+  allKycRecords: KYC[] = [];
+  
+  // Filtered data arrays
   filteredApplications: LoanApplication[] = [];
   filteredLoans: Loan[] = [];
   
-  // Filter options
+  // Filter and search options
   applicationStatusFilter = 'all';
   loanStatusFilter = 'all';
+  applicationSearchTerm = '';
+  loanSearchTerm = '';
   
   constructor(
     private firestore: AngularFirestore,
@@ -80,56 +116,304 @@ export class AdminLoanManagementPage implements OnInit {
   }
 
   loadData() {
-    // Load loan applications - no ordering, just pull data
-    this.loanApplications$ = this.firestore
-      .collection<LoanApplication>('loan-applications')
+    // Load KYC records first
+    this.kycRecords$ = this.firestore
+      .collection<KYC>('kyc')
       .valueChanges({ idField: 'id' });
+
+    // Load loan applications with KYC verification
+    this.loanApplications$ = combineLatest([
+      this.firestore.collection<LoanApplication>('loan-applications').valueChanges({ idField: 'id' }),
+      this.kycRecords$
+    ]).pipe(
+      map(([applications, kycRecords]) => {
+        // Create a map of userId to KYC status for quick lookup
+        const kycMap = new Map<string, KYC>();
+        kycRecords.forEach(kyc => {
+          kycMap.set(kyc.userId, kyc);
+        });
+
+        // Filter applications to only include those with verified KYC
+        const verifiedApplications = applications.filter(app => {
+          const kycRecord = kycMap.get(app.userId);
+          return kycRecord && kycRecord.status === 'verified';
+        });
+
+        // Enhance applications with KYC information
+        const enhancedApplications = verifiedApplications.map(app => {
+          const kycRecord = kycMap.get(app.userId);
+          return {
+            ...app,
+            kycStatus: kycRecord?.status,
+            kycVerifiedAt: kycRecord?.verifiedAt
+          };
+        });
+
+        // Sort by creation date (newest first)
+        return enhancedApplications.sort((a, b) => {
+          const dateA = a.createdAt ? (a.createdAt as any).toDate() : new Date(0);
+          const dateB = b.createdAt ? (b.createdAt as any).toDate() : new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        });
+      })
+    );
     
-    // Load loans - no ordering, just pull data
-    this.loans$ = this.firestore
-      .collection<Loan>('loans')
-      .valueChanges({ idField: 'id' });
+    // Load loans with KYC verification
+    this.loans$ = combineLatest([
+      this.firestore.collection<Loan>('loans').valueChanges({ idField: 'id' }),
+      this.kycRecords$
+    ]).pipe(
+      map(([loans, kycRecords]) => {
+        // Create a map of userId to KYC status for quick lookup
+        const kycMap = new Map<string, KYC>();
+        kycRecords.forEach(kyc => {
+          kycMap.set(kyc.userId, kyc);
+        });
+
+        // Filter loans to only include those with verified KYC
+        const verifiedLoans = loans.filter(loan => {
+          const kycRecord = kycMap.get(loan.userId);
+          return kycRecord && kycRecord.status === 'verified';
+        });
+
+        // Sort by creation date (newest first)
+        return verifiedLoans.sort((a, b) => {
+          const dateA = a.createdAt ? (a.createdAt as any).toDate() : new Date(0);
+          const dateB = b.createdAt ? (b.createdAt as any).toDate() : new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        });
+      })
+    );
     
     // Subscribe to data changes
     this.loanApplications$.subscribe(applications => {
-      this.filteredApplications = this.filterApplications(applications);
+      this.allApplications = applications;
+      this.applyApplicationFilters();
     });
     
     this.loans$.subscribe(loans => {
-      this.filteredLoans = this.filterLoans(loans);
+      this.allLoans = loans;
+      this.applyLoanFilters();
+    });
+
+    this.kycRecords$.subscribe(kycRecords => {
+      this.allKycRecords = kycRecords;
     });
   }
 
-  filterApplications(applications: LoanApplication[]): LoanApplication[] {
-    if (this.applicationStatusFilter === 'all') {
-      return applications;
+  // Helper method to check KYC verification status
+  private async checkKycVerification(userId: string): Promise<boolean> {
+    try {
+      const kycDoc = await this.firestore.doc(`kyc/${userId}`).get().toPromise();
+      if (kycDoc && kycDoc.exists) {
+        const kycData = kycDoc.data() as KYC;
+        return kycData.status === 'verified';
+      }
+      return false;
+    } catch (error) {
+      console.error('Error checking KYC status:', error);
+      return false;
     }
-    return applications.filter(app => app.status === this.applicationStatusFilter);
   }
 
-  filterLoans(loans: Loan[]): Loan[] {
-    if (this.loanStatusFilter === 'all') {
-      return loans;
-    }
-    return loans.filter(loan => loan.status === this.loanStatusFilter);
+  // Helper method to get KYC status for a user
+  private getKycStatus(userId: string): KYC | null {
+    return this.allKycRecords.find(kyc => kyc.userId === userId) || null;
+  }
+
+  // Application search and filter methods
+  onApplicationSearch() {
+    this.applyApplicationFilters();
   }
 
   onApplicationFilterChange() {
-    this.loanApplications$.subscribe(applications => {
-      this.filteredApplications = this.filterApplications(applications);
-    });
+    this.applyApplicationFilters();
+  }
+
+  private applyApplicationFilters() {
+    let filtered = [...this.allApplications];
+
+    // Apply status filter
+    if (this.applicationStatusFilter !== 'all') {
+      filtered = filtered.filter(app => app.status === this.applicationStatusFilter);
+    }
+
+    // Apply search filter
+    if (this.applicationSearchTerm.trim()) {
+      const searchTerm = this.applicationSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(app => 
+        app.fullName.toLowerCase().includes(searchTerm) ||
+        app.email.toLowerCase().includes(searchTerm) ||
+        app.phone.includes(searchTerm) ||
+        app.purpose.toLowerCase().includes(searchTerm) ||
+        app.userId.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    this.filteredApplications = filtered;
+  }
+
+  // Loan search and filter methods
+  onLoanSearch() {
+    this.applyLoanFilters();
   }
 
   onLoanFilterChange() {
-    this.loans$.subscribe(loans => {
-      this.filteredLoans = this.filterLoans(loans);
-    });
+    this.applyLoanFilters();
+  }
+
+  private applyLoanFilters() {
+    let filtered = [...this.allLoans];
+
+    // Apply status filter
+    if (this.loanStatusFilter !== 'all') {
+      filtered = filtered.filter(loan => loan.status === this.loanStatusFilter);
+    }
+
+    // Apply search filter
+    if (this.loanSearchTerm.trim()) {
+      const searchTerm = this.loanSearchTerm.toLowerCase().trim();
+      filtered = filtered.filter(loan => 
+        loan.id.toLowerCase().includes(searchTerm) ||
+        loan.userId.toLowerCase().includes(searchTerm) ||
+        loan.purpose.toLowerCase().includes(searchTerm) ||
+        loan.amount.toString().includes(searchTerm)
+      );
+    }
+
+    this.filteredLoans = filtered;
+  }
+
+  // Clear search methods
+  clearApplicationSearch() {
+    this.applicationSearchTerm = '';
+    this.applyApplicationFilters();
+  }
+
+  clearLoanSearch() {
+    this.loanSearchTerm = '';
+    this.applyLoanFilters();
+  }
+
+  // Search helper methods for additional functionality
+  getApplicationSearchResultsCount(): number {
+    return this.filteredApplications.length;
+  }
+
+  getLoanSearchResultsCount(): number {
+    return this.filteredLoans.length;
+  }
+
+  // Enhanced search with multiple criteria
+  searchApplicationsAdvanced(criteria: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    minAmount?: number;
+    maxAmount?: number;
+    status?: string;
+    purpose?: string;
+  }) {
+    let filtered = [...this.allApplications];
+
+    if (criteria.name) {
+      filtered = filtered.filter(app => 
+        app.fullName.toLowerCase().includes(criteria.name!.toLowerCase())
+      );
+    }
+
+    if (criteria.email) {
+      filtered = filtered.filter(app => 
+        app.email.toLowerCase().includes(criteria.email!.toLowerCase())
+      );
+    }
+
+    if (criteria.phone) {
+      filtered = filtered.filter(app => 
+        app.phone.includes(criteria.phone!)
+      );
+    }
+
+    if (criteria.minAmount !== undefined) {
+      filtered = filtered.filter(app => app.amount >= criteria.minAmount!);
+    }
+
+    if (criteria.maxAmount !== undefined) {
+      filtered = filtered.filter(app => app.amount <= criteria.maxAmount!);
+    }
+
+    if (criteria.status && criteria.status !== 'all') {
+      filtered = filtered.filter(app => app.status === criteria.status);
+    }
+
+    if (criteria.purpose) {
+      filtered = filtered.filter(app => 
+        app.purpose.toLowerCase().includes(criteria.purpose!.toLowerCase())
+      );
+    }
+
+    this.filteredApplications = filtered;
+  }
+
+  // Quick search presets
+  searchPendingApplications() {
+    this.applicationStatusFilter = 'pending';
+    this.applicationSearchTerm = '';
+    this.applyApplicationFilters();
+  }
+
+  searchHighValueLoans(threshold: number = 10000) {
+    this.loanSearchTerm = '';
+    this.loanStatusFilter = 'all';
+    this.filteredLoans = this.allLoans.filter(loan => loan.amount >= threshold);
+  }
+
+  searchActiveLoans() {
+    this.loanStatusFilter = 'active';
+    this.loanSearchTerm = '';
+    this.applyLoanFilters();
+  }
+
+  searchOverdueLoans() {
+    // This would require payment data analysis
+    this.loanStatusFilter = 'active';
+    this.loanSearchTerm = '';
+    this.applyLoanFilters();
+    
+    // Additional logic to filter by overdue payments would go here
+    // You'd need to check the payments array for overdue items
   }
 
   async approveApplication(application: LoanApplication) {
+    // Double-check KYC verification before showing approval dialog
+    const isKycVerified = await this.checkKycVerification(application.userId);
+    
+    if (!isKycVerified) {
+      const toast = await this.toastController.create({
+        message: 'Cannot approve application: User KYC is not verified',
+        duration: 4000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
+      return;
+    }
+
+    const kycRecord = this.getKycStatus(application.userId);
+    const kycVerificationDate = kycRecord?.verifiedAt ? 
+      this.formatDate(kycRecord.verifiedAt) : 'Unknown';
+
     const alert = await this.alertController.create({
       header: 'Approve Loan Application',
-      message: `Are you sure you want to approve the loan application for ${application.fullName}?`,
+      message: `
+        <div>
+          <p><strong>Applicant:</strong> ${application.fullName}</p>
+          <p><strong>KYC Status:</strong> <span style="color: green;">✓ Verified</span></p>
+          <p><strong>KYC Verified:</strong> ${kycVerificationDate}</p>
+          <br>
+          <p>Are you sure you want to approve this loan application?</p>
+        </div>
+      `,
       inputs: [
         {
           name: 'loanAmount',
@@ -158,7 +442,14 @@ export class AdminLoanManagementPage implements OnInit {
         {
           text: 'Approve',
           handler: async (data) => {
+            // Final KYC check before processing
+            const finalKycCheck = await this.checkKycVerification(application.userId);
+            if (!finalKycCheck) {
+              this.showToast('KYC verification lost. Cannot proceed with approval.', 'danger');
+              return false;
+            }
             await this.processApplicationApproval(application, data);
+            return true;
           }
         }
       ]
@@ -173,6 +464,14 @@ export class AdminLoanManagementPage implements OnInit {
     await loading.present();
 
     try {
+      // Final KYC verification check
+      const isKycVerified = await this.checkKycVerification(application.userId);
+      if (!isKycVerified) {
+        await loading.dismiss();
+        this.showToast('Cannot process approval: User KYC is no longer verified', 'danger');
+        return;
+      }
+
       const now = new Date();
       
       // Update the loan record in the loans collection
@@ -270,9 +569,23 @@ export class AdminLoanManagementPage implements OnInit {
   }
 
   async activateLoan(loan: Loan) {
+    // Check KYC verification before activation
+    const isKycVerified = await this.checkKycVerification(loan.userId);
+    
+    if (!isKycVerified) {
+      const toast = await this.toastController.create({
+        message: 'Cannot activate loan: User KYC is not verified',
+        duration: 4000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Activate Loan',
-      message: `Activate loan for user ${loan.userId}?`,
+      message: `Activate loan for user ${loan.userId}? (KYC Status: ✓ Verified)`,
       buttons: [
         {
           text: 'Cancel',
@@ -296,6 +609,14 @@ export class AdminLoanManagementPage implements OnInit {
     await loading.present();
 
     try {
+      // Final KYC verification check
+      const isKycVerified = await this.checkKycVerification(loan.userId);
+      if (!isKycVerified) {
+        await loading.dismiss();
+        this.showToast('Cannot activate loan: User KYC is no longer verified', 'danger');
+        return;
+      }
+
       const now = new Date();
       
       await this.firestore.doc(`loans/${loan.id}`).update({
@@ -446,5 +767,26 @@ export class AdminLoanManagementPage implements OnInit {
   // Helper method to get monthly payment for display
   getMonthlyPayment(item: Loan | LoanApplication): number {
     return this.calculateMonthlyPayment(item.amount, item.interestRate, item.term);
+  }
+
+  // Helper method to get KYC verification status display
+  getKycStatusDisplay(userId: string): { status: string; color: string; verified: boolean } {
+    const kycRecord = this.getKycStatus(userId);
+    if (!kycRecord) {
+      return { status: 'No KYC', color: 'danger', verified: false };
+    }
+    
+    switch (kycRecord.status) {
+      case 'verified':
+        return { status: 'Verified ✓', color: 'success', verified: true };
+      case 'approved':
+        return { status: 'Approved', color: 'primary', verified: false };
+      case 'pending':
+        return { status: 'Pending', color: 'warning', verified: false };
+      case 'rejected':
+        return { status: 'Rejected', color: 'danger', verified: false };
+      default:
+        return { status: 'Unknown', color: 'medium', verified: false };
+    }
   }
 }

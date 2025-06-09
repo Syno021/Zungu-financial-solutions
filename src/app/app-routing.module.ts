@@ -27,6 +27,10 @@ const routes: Routes = [
     path: 'user-profile',
     loadChildren: () => import('./user-profile/user-profile.module').then( m => m.UserProfilePageModule)
   },
+  {
+    path: 'admin-kyc',
+    loadChildren: () => import('./admin-kyc/admin-kyc.module').then( m => m.AdminKycPageModule)
+  },
 
   
 
