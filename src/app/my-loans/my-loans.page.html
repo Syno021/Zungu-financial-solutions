@@ -1,0 +1,239 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>My Loans</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">My Loans</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading your loans...</p>
+  </div>
+
+  <!-- No User State -->
+  <div *ngIf="!loading && !currentUser" class="empty-state">
+    <ion-icon name="person-outline" size="large"></ion-icon>
+    <h2>Not Authenticated</h2>
+    <p>Please log in to view your loans.</p>
+  </div>
+
+  <!-- No Loans State -->
+  <div *ngIf="!loading && currentUser && (!loans || loans.length === 0)" class="empty-state">
+    <ion-icon name="document-text-outline" size="large"></ion-icon>
+    <h2>No Loans Found</h2>
+    <p>You haven't applied for any loans yet.</p>
+    <ion-button routerLink="/loans" fill="solid">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Apply for Loan
+    </ion-button>
+  </div>
+
+  <!-- Loans List -->
+  <div *ngIf="!loading && currentUser && loans && loans.length > 0" class="loans-container">
+    
+    <!-- Summary Card -->
+    <ion-card class="summary-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="analytics-outline"></ion-icon>
+          Loan Summary
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-row>
+          <ion-col size="6">
+            <div class="summary-item">
+              <span class="summary-label">Total Loans</span>
+              <span class="summary-value">{{ loans?.length || 0 }}</span>
+            </div>
+          </ion-col>
+          <ion-col size="6">
+            <div class="summary-item">
+              <span class="summary-label">Active Loans</span>
+              <span class="summary-value">{{ getActiveLoansCount() }}</span>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Individual Loan Cards -->
+    <ion-card *ngFor="let loan of loans; trackBy: trackByLoanId" class="loan-card">
+      <ion-card-header>
+        <ion-row class="ion-align-items-center">
+          <ion-col>
+            <ion-card-title>
+              <ion-icon [name]="getStatusIcon(loan.status)" [color]="getStatusColor(loan.status)"></ion-icon>
+              R{{ loan.amount | number:'1.2-2' }}
+            </ion-card-title>
+            <ion-card-subtitle>{{ loan.purpose || 'N/A' }}</ion-card-subtitle>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-chip [color]="getStatusColor(loan.status)">
+              <ion-label>{{ loan.status | titlecase }}</ion-label>
+            </ion-chip>
+          </ion-col>
+        </ion-row>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Loan Details -->
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <div class="detail-item">
+                <ion-label class="detail-label">Interest Rate</ion-label>
+                <ion-label class="detail-value">{{ loan.interestRate || 0 }}%</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size="6">
+              <div class="detail-item">
+                <ion-label class="detail-label">Term</ion-label>
+                <ion-label class="detail-value">{{ loan.term || 0 }} months</ion-label>
+              </div>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="6">
+              <div class="detail-item">
+                <ion-label class="detail-label">Applied Date</ion-label>
+                <ion-label class="detail-value">{{ formatDate(loan.createdAt) }}</ion-label>
+              </div>
+            </ion-col>
+            <ion-col size="6" *ngIf="loan.approvedAt">
+              <div class="detail-item">
+                <ion-label class="detail-label">Approved Date</ion-label>
+                <ion-label class="detail-value">{{ formatDate(loan.approvedAt) }}</ion-label>
+              </div>
+            </ion-col>
+          </ion-row>
+
+          <!-- Payment Information for Active/Completed Loans -->
+          <div *ngIf="loan.status === 'active' || loan.status === 'completed'">
+            <ion-row>
+              <ion-col size="12">
+                <div class="payment-summary">
+                  <h4>Payment Summary</h4>
+                </div>
+              </ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="6">
+                <div class="detail-item">
+                  <ion-label class="detail-label">Total Due</ion-label>
+                  <ion-label class="detail-value">R{{ calculateTotalDue(loan) | number:'1.2-2' }}</ion-label>
+                </div>
+              </ion-col>
+              <ion-col size="6">
+                <div class="detail-item">
+                  <ion-label class="detail-label">Remaining Balance</ion-label>
+                  <ion-label class="detail-value" [class.completed]="calculateRemainingBalance(loan) <= 0">
+                    R{{ calculateRemainingBalance(loan) | number:'1.2-2' }}
+                  </ion-label>
+                </div>
+              </ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="6">
+                <div class="detail-item">
+                  <ion-label class="detail-label">Monthly Payment</ion-label>
+                  <ion-label class="detail-value">R{{ calculateMonthlyPayment(loan) | number:'1.2-2' }}</ion-label>
+                </div>
+              </ion-col>
+              <ion-col size="6">
+                <div class="detail-item">
+                  <ion-label class="detail-label">Payments Made</ion-label>
+                  <ion-label class="detail-value">{{ loan.payments?.length || 0 }}</ion-label>
+                </div>
+              </ion-col>
+            </ion-row>
+
+            <!-- Payment History -->
+            <div *ngIf="loan.payments && loan.payments.length > 0" class="payment-history">
+              <h5>Recent Payments</h5>
+              <ion-list>
+                <ion-item *ngFor="let payment of loan.payments.slice(-3)">
+                  <ion-icon 
+                    [name]="payment.status === 'paid' ? 'checkmark-circle' : payment.status === 'overdue' ? 'warning' : 'time'" 
+                    [color]="payment.status === 'paid' ? 'success' : payment.status === 'overdue' ? 'danger' : 'warning'"
+                    slot="start">
+                  </ion-icon>
+                  <ion-label>
+                    <h3>R{{ payment.amount | number:'1.2-2' }}</h3>
+                    <p>{{ formatDate(payment.paidAt || payment.dueDate) }} - {{ payment.status | titlecase }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+            </div>
+
+            <!-- Payment Button -->
+            <ion-row *ngIf="loan.status === 'active' && calculateRemainingBalance(loan) > 0">
+              <ion-col>
+                <ion-button 
+                  expand="block" 
+                  (click)="showPaymentOptions(loan)"
+                  color="primary">
+                  <ion-icon name="card-outline" slot="start"></ion-icon>
+                  Make Payment
+                </ion-button>
+              </ion-col>
+            </ion-row>
+
+            <!-- Loan Completed Message -->
+            <ion-row *ngIf="calculateRemainingBalance(loan) <= 0">
+              <ion-col>
+                <ion-item color="success" lines="none">
+                  <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                  <ion-label>
+                    <h3>Loan Fully Paid!</h3>
+                    <p>Congratulations on completing your loan payments.</p>
+                  </ion-label>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </div>
+
+          <!-- Pending/Rejected Status Message -->
+          <div *ngIf="loan.status === 'pending'">
+            <ion-item color="warning" lines="none">
+              <ion-icon name="time" slot="start"></ion-icon>
+              <ion-label>
+                <h3>Application Under Review</h3>
+                <p>Your loan application is being processed.</p>
+              </ion-label>
+            </ion-item>
+          </div>
+
+          <div *ngIf="loan.status === 'rejected'">
+            <ion-item color="danger" lines="none">
+              <ion-icon name="close-circle" slot="start"></ion-icon>
+              <ion-label>
+                <h3>Application Rejected</h3>
+                <p>Unfortunately, your loan application was not approved.</p>
+              </ion-label>
+            </ion-item>
+          </div>
+
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Floating Action Button for New Loan -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button routerLink="/apply-loan">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

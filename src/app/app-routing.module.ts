@@ -31,6 +31,10 @@ const routes: Routes = [
     path: 'admin-kyc',
     loadChildren: () => import('./admin-kyc/admin-kyc.module').then( m => m.AdminKycPageModule)
   },
+  {
+    path: 'my-loans',
+    loadChildren: () => import('./my-loans/my-loans.module').then( m => m.MyLoansPageModule)
+  },
 
   
 

@@ -108,38 +108,44 @@ export class AdminKycPage implements OnInit, OnDestroy {
   }
 
   onSearchChange(event: any) {
-    // Handle null/undefined cases
-    this.searchTerm = event?.detail?.value?.toLowerCase() || '';
+  // For ion-searchbar, the value is in event.detail.value
+    this.searchTerm = (event?.detail?.value ?? '').toLowerCase();
     this.applyFilters();
   }
 
   onStatusChange(event: any) {
-    // Handle null/undefined cases
-    this.selectedStatus = event?.detail?.value || 'all';
+  // For ion-select, the value is in event.detail.value
+    this.selectedStatus = event?.detail?.value ?? 'all';
     this.applyFilters();
   }
 
   applyFilters() {
-    // Start with all applications
+  // Start with all applications
     let filtered = [...this.kycApplications];
 
-    // Apply search filter if searchTerm exists
+    // Apply search filter
     if (this.searchTerm && this.searchTerm.trim() !== '') {
-      filtered = filtered.filter(app => 
-        (app.user?.name?.toLowerCase() || '').includes(this.searchTerm) ||
-        (app.user?.surname?.toLowerCase() || '').includes(this.searchTerm) ||
-        (app.user?.email?.toLowerCase() || '').includes(this.searchTerm) ||
-        (app.id?.toLowerCase() || '').includes(this.searchTerm)
-      );
+      const searchLower = this.searchTerm.trim();
+      filtered = filtered.filter(app => {
+        const userName = app.user?.name?.toLowerCase() ?? '';
+        const userSurname = app.user?.surname?.toLowerCase() ?? '';
+        const userEmail = app.user?.email?.toLowerCase() ?? '';
+        const appId = app.id?.toLowerCase() ?? '';
+        
+        return userName.includes(searchLower) ||
+              userSurname.includes(searchLower) ||
+              userEmail.includes(searchLower) ||
+              appId.includes(searchLower);
+      });
     }
 
-    // Apply status filter if not 'all'
+    // Apply status filter
     if (this.selectedStatus && this.selectedStatus !== 'all') {
       filtered = filtered.filter(app => app.status === this.selectedStatus);
     }
 
-    // Update filtered applications
     this.filteredApplications = filtered;
+    console.log('Filtered results:', this.filteredApplications.length);
   }
 
   // Add this method to reset filters

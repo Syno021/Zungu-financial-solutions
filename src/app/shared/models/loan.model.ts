@@ -25,11 +25,3 @@ export interface Loan {
     paidAt?: Date;
     transactionId?: string;
   }
-
-  export interface Payment {
-  id: string;
-  amount: number;
-  dueDate: Date;
-  paidDate?: Date;
-  status: 'pending' | 'paid' | 'overdue';
-}

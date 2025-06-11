@@ -12,7 +12,8 @@ export const environment = {
     messagingSenderId: "810422375142",
     appId: "1:810422375142:web:740176c2bcb97431716127",
     measurementId: "G-YPH2ZHEFSC"
-  }
+  },
+  paystackTestPublicKey: 'pk_test_0553ae959cc7caa09e540a64fef7a6e62cbbbe43'
 };
 
 /*

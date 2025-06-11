@@ -203,18 +203,96 @@ export class AdminLoanManagementPage implements OnInit {
 
   // Helper method to check KYC verification status
   private async checkKycVerification(userId: string): Promise<boolean> {
-    try {
-      const kycDoc = await this.firestore.doc(`kyc/${userId}`).get().toPromise();
-      if (kycDoc && kycDoc.exists) {
-        const kycData = kycDoc.data() as KYC;
-        return kycData.status === 'verified';
+  try {
+    console.log(`Checking KYC verification for user: ${userId}`);
+    
+    // First check if we have the KYC record in our local data
+    const localKycRecord = this.allKycRecords.find(kyc => kyc.userId === userId);
+    
+    if (localKycRecord) {
+      console.log(`Local KYC status for ${userId}:`, localKycRecord.status);
+      const isVerified = localKycRecord.status === 'verified';
+      
+      if (!isVerified) {
+        console.log(`KYC not verified for user ${userId}. Status: ${localKycRecord.status}`);
+        await this.showKycErrorToast(localKycRecord.status);
       }
-      return false;
-    } catch (error) {
-      console.error('Error checking KYC status:', error);
-      return false;
+      
+      return isVerified;
     }
+    
+    // If not found locally, fetch from Firestore
+    console.log(`KYC record not found locally for ${userId}, fetching from Firestore...`);
+    
+    const kycQuery = await this.firestore
+      .collection('kyc', ref => ref.where('userId', '==', userId))
+      .get()
+      .toPromise();
+    
+    if (kycQuery && !kycQuery.empty) {
+      const kycDoc = kycQuery.docs[0];
+      const kycData = kycDoc.data() as KYC;
+      
+      console.log(`Firestore KYC status for ${userId}:`, kycData.status);
+      const isVerified = kycData.status === 'verified';
+      
+      if (!isVerified) {
+        console.log(`KYC not verified for user ${userId}. Status: ${kycData.status}`);
+        await this.showKycErrorToast(kycData.status);
+      }
+      
+      return isVerified;
+    }
+    
+    // No KYC record found at all
+    console.log(`No KYC record found for user ${userId}`);
+    await this.showKycErrorToast('not_found');
+    return false;
+    
+  } catch (error) {
+    console.error('Error checking KYC verification status:', error);
+    await this.showKycErrorToast('error');
+    return false;
   }
+}
+
+private async showKycErrorToast(status: string) {
+  let message = '';
+  
+  switch (status) {
+    case 'pending':
+      message = 'Cannot proceed: User KYC verification is still pending';
+      break;
+    case 'rejected':
+      message = 'Cannot proceed: User KYC verification was rejected';
+      break;
+    case 'approved':
+      message = 'Cannot proceed: User KYC is approved but not yet verified';
+      break;
+    case 'not_found':
+      message = 'Cannot proceed: No KYC record found for this user';
+      break;
+    case 'error':
+      message = 'Cannot proceed: Error checking KYC verification status';
+      break;
+    default:
+      message = `Cannot proceed: User KYC status is '${status}', verification required`;
+  }
+  
+  const toast = await this.toastController.create({
+    message: message,
+    duration: 4000,
+    color: 'danger',
+    position: 'top',
+    buttons: [
+      {
+        text: 'Dismiss',
+        role: 'cancel'
+      }
+    ]
+  });
+  await toast.present();
+}
 
   // Helper method to get KYC status for a user
   private getKycStatus(userId: string): KYC | null {

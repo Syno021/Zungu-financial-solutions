@@ -94,7 +94,7 @@ export class HomePage {
 
         await this.afAuth.signInWithEmailAndPassword(email, password);
         this.closeLoginCard();
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/my-loans']);
       } catch (error: any) {
         let message = 'Login failed. Please try again.';
         if (error.code === 'auth/user-not-found') {
