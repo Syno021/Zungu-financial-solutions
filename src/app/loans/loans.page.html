@@ -16,10 +16,10 @@
     <ion-card>
       <ion-card-header>
         <ion-card-title>Our Loan Offerings</ion-card-title>
-        <ion-card-subtitle>Competitive rates and flexible terms</ion-card-subtitle>
+        <ion-card-subtitle>Competitive rates with 1-month term</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <p>We offer various loan products to meet your financial needs with competitive interest rates and flexible repayment terms.</p>
+        <p>We offer various loan products to meet your financial needs with competitive interest rates and a convenient 1-month repayment term.</p>
       </ion-card-content>
     </ion-card>
 
@@ -42,13 +42,13 @@
                 <ion-item>
                   <ion-label>
                     <h3>Interest Rate</h3>
-                    <p>12% - 24% per annum</p>
+                    <p>30% per annum</p>
                   </ion-label>
                 </ion-item>
                 <ion-item>
                   <ion-label>
                     <h3>Term</h3>
-                    <p>6 - 72 months</p>
+                    <p>1 month</p>
                   </ion-label>
                 </ion-item>
               </ion-list>
@@ -72,75 +72,13 @@
                 <ion-item>
                   <ion-label>
                     <h3>Interest Rate</h3>
-                    <p>10% - 20% per annum</p>
+                    <p>30% per annum</p>
                   </ion-label>
                 </ion-item>
                 <ion-item>
                   <ion-label>
                     <h3>Term</h3>
-                    <p>12 - 120 months</p>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col size="12" size-md="6">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title color="tertiary">Vehicle Loans</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-list>
-                <ion-item>
-                  <ion-label>
-                    <h3>Amount Range</h3>
-                    <p>R50,000 - R2,000,000</p>
-                  </ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-label>
-                    <h3>Interest Rate</h3>
-                    <p>8% - 18% per annum</p>
-                  </ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-label>
-                    <h3>Term</h3>
-                    <p>24 - 84 months</p>
-                  </ion-label>
-                </ion-item>
-              </ion-list>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-
-        <ion-col size="12" size-md="6">
-          <ion-card>
-            <ion-card-header>
-              <ion-card-title color="success">Home Loans</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-list>
-                <ion-item>
-                  <ion-label>
-                    <h3>Amount Range</h3>
-                    <p>R100,000 - R5,000,000</p>
-                  </ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-label>
-                    <h3>Interest Rate</h3>
-                    <p>7% - 15% per annum</p>
-                  </ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-label>
-                    <h3>Term</h3>
-                    <p>120 - 240 months</p>
+                    <p>1 month</p>
                   </ion-label>
                 </ion-item>
               </ion-list>
@@ -216,8 +154,6 @@
                 required>
                 <ion-select-option value="personal">Personal Loan</ion-select-option>
                 <ion-select-option value="business">Business Loan</ion-select-option>
-                <ion-select-option value="vehicle">Vehicle Loan</ion-select-option>
-                <ion-select-option value="home">Home Loan</ion-select-option>
               </ion-select>
             </ion-item>
 
@@ -233,22 +169,15 @@
               </ion-input>
             </ion-item>
 
+            <!-- Hidden term field with fixed value of 1 month -->
+            <input type="hidden" [(ngModel)]="loanApplication.term" name="term" value="1">
+            
+            <!-- Display-only field showing the fixed term -->
             <ion-item>
-              <ion-select 
-                label="Loan Term" 
-                placeholder="Select term" 
-                [(ngModel)]="loanApplication.term" 
-                name="term" 
-                required>
-                <ion-select-option value="6">6 months</ion-select-option>
-                <ion-select-option value="12">12 months</ion-select-option>
-                <ion-select-option value="18">18 months</ion-select-option>
-                <ion-select-option value="24">24 months</ion-select-option>
-                <ion-select-option value="36">36 months</ion-select-option>
-                <ion-select-option value="48">48 months</ion-select-option>
-                <ion-select-option value="60">60 months</ion-select-option>
-                <ion-select-option value="72">72 months</ion-select-option>
-              </ion-select>
+              <ion-label>
+                <h3>Loan Term</h3>
+                <p>1 month (fixed)</p>
+              </ion-label>
             </ion-item>
 
             <ion-item>
@@ -258,7 +187,8 @@
                 placeholder="Enter your full name" 
                 [(ngModel)]="loanApplication.fullName" 
                 name="fullName" 
-                required>
+                required
+                readonly>
               </ion-input>
             </ion-item>
 
@@ -269,7 +199,8 @@
                 placeholder="Enter your email" 
                 [(ngModel)]="loanApplication.email" 
                 name="email" 
-                required>
+                required
+                readonly>
               </ion-input>
             </ion-item>
 
@@ -280,7 +211,8 @@
                 placeholder="Enter your phone number" 
                 [(ngModel)]="loanApplication.phone" 
                 name="phone" 
-                required>
+                required
+                readonly>
               </ion-input>
             </ion-item>
 
@@ -314,7 +246,7 @@
             <ion-card-content>
               <ion-item>
                 <ion-label>
-                  <h3>Estimated Interest Rate</h3>
+                  <h3>Interest Rate</h3>
                   <p>{{ estimatedRate }}% per annum</p>
                 </ion-label>
               </ion-item>
@@ -322,6 +254,12 @@
                 <ion-label>
                   <h3>Estimated Monthly Payment</h3>
                   <p>R{{ calculateMonthlyPayment() | number:'1.2-2' }}</p>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-label>
+                  <h3>Loan Term</h3>
+                  <p>1 month</p>
                 </ion-label>
               </ion-item>
             </ion-card-content>
@@ -342,128 +280,126 @@
     </ng-template>
   </ion-modal>
 
-  <!-- Add this KYC Modal to your existing loans.page.html file -->
+  <!-- KYC Documents Modal -->
+  <ion-modal [isOpen]="isKycModalOpen" (didDismiss)="closeKycModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>KYC Verification</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeKycModal()" fill="clear">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
 
-<!-- KYC Documents Modal -->
-<ion-modal [isOpen]="isKycModalOpen" (didDismiss)="closeKycModal()">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>KYC Verification</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="closeKycModal()" fill="clear">
-            <ion-icon name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="ion-padding">
-      <div class="kyc-info">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Document Verification Required</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <p>To apply for a loan, please upload the following documents for verification:</p>
-            <ul>
-              <li>Valid ID Document (National ID, Passport, or Driver's License)</li>
-              <li>Proof of Residence (Utility bill, Bank statement, or Rental agreement)</li>
-            </ul>
-            <p><strong>Note:</strong> Documents must be clear and readable. Accepted formats: JPEG, PNG, PDF (max 5MB each)</p>
-          </ion-card-content>
-        </ion-card>
-      </div>
-
-      <form #kycForm="ngForm" (ngSubmit)="submitKycDocuments()">
-        <!-- ID Document Upload -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>ID Document</ion-card-title>
-            <ion-card-subtitle>Upload a valid government-issued ID</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="file-upload-section">
-              <input 
-                type="file" 
-                accept="image/*,.pdf" 
-                (change)="onFileSelected($event, 'idDocument')"
-                #idFileInput
-                style="display: none;"
-              >
-              
-              <ion-button expand="block" fill="outline" (click)="idFileInput.click()">
-                <ion-icon name="cloud-upload" slot="start"></ion-icon>
-                {{ kycDocuments.idDocument ? 'Change ID Document' : 'Select ID Document' }}
-              </ion-button>
-              
-              <div *ngIf="kycDocuments.idDocument" class="file-info">
-                <ion-chip color="success">
-                  <ion-icon name="document"></ion-icon>
-                  <ion-label>{{ kycDocuments.idDocument.name }}</ion-label>
-                </ion-chip>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-
-        <!-- Proof of Residence Upload -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Proof of Residence</ion-card-title>
-            <ion-card-subtitle>Upload a recent utility bill or bank statement</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="file-upload-section">
-              <input 
-                type="file" 
-                accept="image/*,.pdf" 
-                (change)="onFileSelected($event, 'proofOfResidence')"
-                #residenceFileInput
-                style="display: none;"
-              >
-              
-              <ion-button expand="block" fill="outline" (click)="residenceFileInput.click()">
-                <ion-icon name="cloud-upload" slot="start"></ion-icon>
-                {{ kycDocuments.proofOfResidence ? 'Change Proof of Residence' : 'Select Proof of Residence' }}
-              </ion-button>
-              
-              <div *ngIf="kycDocuments.proofOfResidence" class="file-info">
-                <ion-chip color="success">
-                  <ion-icon name="document"></ion-icon>
-                  <ion-label>{{ kycDocuments.proofOfResidence.name }}</ion-label>
-                </ion-chip>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-
-        <!-- Terms and Conditions -->
-        <ion-card>
-          <ion-card-content>
-            <ion-checkbox labelPlacement="end" #termsCheckbox>
-              <div class="terms-text">
-                I confirm that the documents uploaded are genuine and belong to me. I understand that providing false information may result in rejection of my application.
-              </div>
-            </ion-checkbox>
-          </ion-card-content>
-        </ion-card>
-
-        <!-- Submit Button -->
-        <div class="submit-section">
-          <ion-button 
-            expand="block" 
-            type="submit" 
-            [disabled]="!kycDocuments.idDocument || !kycDocuments.proofOfResidence || !termsCheckbox.checked || isSubmitting"
-            color="primary"
-          >
-            <ion-icon name="cloud-upload" slot="start" *ngIf="!isSubmitting"></ion-icon>
-            <ion-spinner slot="start" *ngIf="isSubmitting"></ion-spinner>
-            {{ isSubmitting ? 'Uploading...' : 'Submit Documents' }}
-          </ion-button>
+      <ion-content class="ion-padding">
+        <div class="kyc-info">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Document Verification Required</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>To apply for a loan, please upload the following documents for verification:</p>
+              <ul>
+                <li>Valid ID Document (National ID, Passport, or Driver's License)</li>
+                <li>Proof of Residence (Utility bill, Bank statement, or Rental agreement)</li>
+              </ul>
+              <p><strong>Note:</strong> Documents must be clear and readable. Accepted formats: JPEG, PNG, PDF (max 5MB each)</p>
+            </ion-card-content>
+          </ion-card>
         </div>
-      </form>
-    </ion-content>
-  </ng-template>
-</ion-modal>
+
+        <form #kycForm="ngForm" (ngSubmit)="submitKycDocuments()">
+          <!-- ID Document Upload -->
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>ID Document</ion-card-title>
+              <ion-card-subtitle>Upload a valid government-issued ID</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="file-upload-section">
+                <input 
+                  type="file" 
+                  accept="image/*,.pdf" 
+                  (change)="onFileSelected($event, 'idDocument')"
+                  #idFileInput
+                  style="display: none;"
+                >
+                
+                <ion-button expand="block" fill="outline" (click)="idFileInput.click()">
+                  <ion-icon name="cloud-upload" slot="start"></ion-icon>
+                  {{ kycDocuments.idDocument ? 'Change ID Document' : 'Select ID Document' }}
+                </ion-button>
+                
+                <div *ngIf="kycDocuments.idDocument" class="file-info">
+                  <ion-chip color="success">
+                    <ion-icon name="document"></ion-icon>
+                    <ion-label>{{ kycDocuments.idDocument.name }}</ion-label>
+                  </ion-chip>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Proof of Residence Upload -->
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Proof of Residence</ion-card-title>
+              <ion-card-subtitle>Upload a recent utility bill or bank statement</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="file-upload-section">
+                <input 
+                  type="file" 
+                  accept="image/*,.pdf" 
+                  (change)="onFileSelected($event, 'proofOfResidence')"
+                  #residenceFileInput
+                  style="display: none;"
+                >
+                
+                <ion-button expand="block" fill="outline" (click)="residenceFileInput.click()">
+                  <ion-icon name="cloud-upload" slot="start"></ion-icon>
+                  {{ kycDocuments.proofOfResidence ? 'Change Proof of Residence' : 'Select Proof of Residence' }}
+                </ion-button>
+                
+                <div *ngIf="kycDocuments.proofOfResidence" class="file-info">
+                  <ion-chip color="success">
+                    <ion-icon name="document"></ion-icon>
+                    <ion-label>{{ kycDocuments.proofOfResidence.name }}</ion-label>
+                  </ion-chip>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Terms and Conditions -->
+          <ion-card>
+            <ion-card-content>
+              <ion-checkbox labelPlacement="end" #termsCheckbox>
+                <div class="terms-text">
+                  I confirm that the documents uploaded are genuine and belong to me. I understand that providing false information may result in rejection of my application.
+                </div>
+              </ion-checkbox>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Submit Button -->
+          <div class="submit-section">
+            <ion-button 
+              expand="block" 
+              type="submit" 
+              [disabled]="!kycDocuments.idDocument || !kycDocuments.proofOfResidence || !termsCheckbox.checked || isSubmitting"
+              color="primary"
+            >
+              <ion-icon name="cloud-upload" slot="start" *ngIf="!isSubmitting"></ion-icon>
+              <ion-spinner slot="start" *ngIf="isSubmitting"></ion-spinner>
+              {{ isSubmitting ? 'Uploading...' : 'Submit Documents' }}
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

@@ -40,7 +40,7 @@ export class LoansPage implements OnInit {
   isModalOpen = false;
   isKycModalOpen = false;
   isSubmitting = false;
-  estimatedRate = 0;
+  estimatedRate = 30; // Fixed rate of 30% monthly
   currentUserDocId: string | null = null;
   currentUser: User | null = null;
   isUserLoggedIn = false;
@@ -50,7 +50,7 @@ export class LoansPage implements OnInit {
     email: '',
     phone: '',
     amount: 0,
-    term: 12,
+    term: 1, // Changed from 12 to 1 (one month)
     purpose: '',
     monthlyIncome: 0,
     additionalInfo: ''
@@ -60,14 +60,6 @@ export class LoansPage implements OnInit {
   kycDocuments = {
     idDocument: null as File | null,
     proofOfResidence: null as File | null
-  };
-
-  // Interest rate ranges for different loan types
-  private interestRates = {
-    personal: { min: 12, max: 24 },
-    business: { min: 10, max: 20 },
-    vehicle: { min: 8, max: 18 },
-    home: { min: 7, max: 15 }
   };
 
   constructor(
@@ -81,7 +73,7 @@ export class LoansPage implements OnInit {
   ngOnInit() {
     // Check user authentication status and get user doc ID
     this.checkUserAuthentication();
-    // Watch for changes in loan application to update estimated rate
+    // Set initial estimated rate
     this.updateEstimatedRate();
   }
 
@@ -147,15 +139,29 @@ export class LoansPage implements OnInit {
 
     // Check if user has KYC documents
     if (!this.currentUser.kycDocs || !this.currentUser.kycDocs.id) {
-      // No KYC documents found, open KYC modal first
-      await this.showAlert('KYC Verification Required', 'Please complete your KYC verification before applying for a loan.');
-      this.openKycModal();
+      // No KYC documents found, show alert and wait for user to click OK before opening KYC modal
+      const alert = await this.alertController.create({
+        header: 'KYC Verification Required',
+        message: 'Please complete your KYC verification before applying for a loan.',
+        buttons: [
+          {
+            text: 'OK',
+            handler: () => {
+              // Open KYC modal after user clicks OK
+              this.openKycModal();
+            }
+          }
+        ]
+      });
+      await alert.present();
       return;
     }
 
     // KYC documents exist, proceed with loan application
     this.isModalOpen = true;
     this.resetForm();
+    // Pre-populate form with user details
+    this.populateUserDetails();
   }
 
   openKycModal() {
@@ -179,12 +185,21 @@ export class LoansPage implements OnInit {
       email: '',
       phone: '',
       amount: 0,
-      term: 12,
+      term: 1, // Changed from 12 to 1 (one month)
       purpose: '',
       monthlyIncome: 0,
       additionalInfo: ''
     };
-    this.estimatedRate = 0;
+    this.estimatedRate = 30;
+  }
+
+  // Populate form with current user details
+  populateUserDetails() {
+    if (this.currentUser) {
+      this.loanApplication.fullName = `${this.currentUser.name} ${this.currentUser.surname}`;
+      this.loanApplication.email = this.currentUser.email;
+      this.loanApplication.phone = this.currentUser.phoneNumber || '';
+    }
   }
 
   resetKycForm() {
@@ -283,6 +298,7 @@ export class LoansPage implements OnInit {
       this.closeKycModal();
       this.isModalOpen = true;
       this.resetForm();
+      this.populateUserDetails();
 
     } catch (error) {
       console.error('Error submitting KYC documents:', error);
@@ -316,38 +332,28 @@ export class LoansPage implements OnInit {
   }
 
   updateEstimatedRate() {
-    if (this.loanApplication.purpose && this.loanApplication.amount > 0) {
-      const rates = this.interestRates[this.loanApplication.purpose as keyof typeof this.interestRates];
-      if (rates) {
-        // Calculate estimated rate based on amount and income
-        let baseRate = rates.min;
-        const amountFactor = Math.min(this.loanApplication.amount / 100000, 1) * 2; // Up to 2% increase for higher amounts
-        const incomeFactor = this.loanApplication.monthlyIncome > 0 ? 
-          Math.max(0, (50000 - this.loanApplication.monthlyIncome) / 50000) * 3 : 3; // Up to 3% increase for lower income
-        
-        this.estimatedRate = Math.min(baseRate + amountFactor + incomeFactor, rates.max);
-        this.estimatedRate = Math.round(this.estimatedRate * 100) / 100; // Round to 2 decimal places
-      }
-    } else {
-      this.estimatedRate = 0;
-    }
+    // Fixed 30% monthly interest rate for all loans
+    this.estimatedRate = 30;
   }
 
   calculateMonthlyPayment(): number {
-    if (this.loanApplication.amount <= 0 || this.loanApplication.term <= 0 || this.estimatedRate <= 0) {
-      return 0;
-    }
-
-    const principal = this.loanApplication.amount;
-    const monthlyRate = (this.estimatedRate / 100) / 12;
-    const numPayments = this.loanApplication.term;
-
-    // Monthly payment formula: M = P * [r(1+r)^n] / [(1+r)^n - 1]
-    const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
-                          (Math.pow(1 + monthlyRate, numPayments) - 1);
-
-    return monthlyPayment;
+  if (this.loanApplication.amount <= 0) {
+    return 0;
   }
+
+  const principal = this.loanApplication.amount;
+  
+  // Simple 30% interest calculation for 30-day loan
+  // Total amount = Principal + (Principal * 30%)
+  const interestAmount = principal * (this.estimatedRate / 100); // 30% of principal
+  const totalAmount = principal + interestAmount;
+
+  console.log('Interest amount:', interestAmount); // Add this line
+  console.log('Total amount:', totalAmount);
+
+  // Since it's a 30-day loan (1 month), the monthly payment is the total amount
+  return totalAmount;
+}
 
   async submitLoanApplication() {
     try {
@@ -372,9 +378,6 @@ export class LoansPage implements OnInit {
         await this.showAlert('Authentication Error', 'Session expired. Please log in again.');
         return;
       }
-
-      // Update estimated rate before submission
-      this.updateEstimatedRate();
 
       // Create loan object using user doc ID
       const loanId = this.firestore.createId();

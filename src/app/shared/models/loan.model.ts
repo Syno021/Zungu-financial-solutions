@@ -12,9 +12,13 @@ export interface Loan {
     startDate?: Date;
     endDate?: Date;
     payments: Payment[];
+    penaltyAmount?: number;
+  penaltyAppliedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
   }
+
+
   
   export interface Payment {
     id: string;
@@ -24,4 +28,5 @@ export interface Loan {
     status: 'pending' | 'paid' | 'overdue';
     paidAt?: Date;
     transactionId?: string;
+    description?: string;
   }

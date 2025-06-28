@@ -808,16 +808,36 @@ private async showKycErrorToast(status: string) {
     }
   }
 
-  calculateMonthlyPayment(principal: number, annualRate: number, months: number): number {
-    if (principal <= 0 || annualRate <= 0 || months <= 0) {
-      return 0;
-    }
-    
-    const monthlyRate = annualRate / 100 / 12;
-    const payment = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / 
-                   (Math.pow(1 + monthlyRate, months) - 1);
-    return Math.round(payment * 100) / 100;
+  // Replace the existing calculateMonthlyPayment function with this simplified version
+calculateMonthlyPayment(principal: number, annualRate: number, months: number): number {
+  if (principal <= 0 || months <= 0) {
+    return 0;
   }
+  
+  // Apply flat 30% interest to the principal
+  const interestRate = 0.30; // 30%
+  const totalInterest = principal * interestRate;
+  const totalAmountToBePaid = principal + totalInterest;
+  
+  // Calculate monthly payment by dividing total amount by number of months
+  const monthlyPayment = totalAmountToBePaid / months;
+  
+  // Round to 2 decimal places
+  return Math.round(monthlyPayment * 100) / 100;
+}
+
+// Optional: You might also want to add a helper function to calculate the total amount
+calculateTotalAmount(principal: number): number {
+  if (principal <= 0) {
+    return 0;
+  }
+  
+  const interestRate = 0.30; // 30%
+  const totalInterest = principal * interestRate;
+  const totalAmount = principal + totalInterest;
+  
+  return Math.round(totalAmount * 100) / 100;
+}
 
   async showToast(message: string, color: string) {
     const toast = await this.toastController.create({
