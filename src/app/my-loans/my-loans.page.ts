@@ -3,11 +3,11 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastController, LoadingController, AlertController, ModalController } from '@ionic/angular';
 import { Subscription, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Loan, Payment } from '../shared/models/loan.model';
 import { User } from '../shared/models/user.model';
 import { environment } from 'src/environments/environment';
-import { browserLocalPersistence, setPersistence } from 'firebase/auth';
+import { Router } from '@angular/router';
 
 declare global {
   interface Window {
@@ -36,10 +36,12 @@ interface PaymentData {
 export class MyLoansPage implements OnInit, OnDestroy {
   private paystackScriptLoaded: boolean = false;
   private subscriptions: Subscription[] = [];
+  private authSubscription?: Subscription;
   
   loans: Loan[] = [];
   currentUser: User | null = null;
   loading: boolean = true;
+  authLoading: boolean = true; // Track auth state loading
   
   constructor(
     private firestore: AngularFirestore,
@@ -48,22 +50,112 @@ export class MyLoansPage implements OnInit, OnDestroy {
     private loadingController: LoadingController,
     private alertController: AlertController,
     private modalController: ModalController,
-    private cdr: ChangeDetectorRef, // Add this for manual change detection
-    private ngZone: NgZone // Add this to ensure operations run in Angular zone
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router
   ) { }
 
   async ngOnInit() {
+    console.log('MyLoansPage: ngOnInit started');
     this.loadPaystackScript();
-    await this.loadCurrentUser();
-    if (this.currentUser) {
-      this.loadUserLoans();
-    } else {
-      this.loading = false;
-    }
+    
+    // Set up auth state listener first
+    this.setupAuthStateListener();
   }
 
   ngOnDestroy() {
+    console.log('MyLoansPage: ngOnDestroy called');
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Set up Firebase Auth state listener for persistent session management
+   */
+  private setupAuthStateListener() {
+    console.log('Setting up auth state listener');
+    
+    this.authSubscription = this.afAuth.authState.pipe(
+      tap(user => console.log('Auth state changed:', user ? 'User logged in' : 'No user')),
+      switchMap(async (firebaseUser) => {
+        this.authLoading = true;
+        
+        if (firebaseUser) {
+          console.log('Firebase user found:', firebaseUser.uid);
+          
+          try {
+            // Get user data from Firestore
+            const userDoc = await this.firestore.collection('users').doc(firebaseUser.uid).get().toPromise();
+            
+            if (userDoc && userDoc.exists) {
+              const userData = userDoc.data() || {};
+              this.currentUser = { 
+                uid: firebaseUser.uid, 
+                email: firebaseUser.email || '',
+                ...userData 
+              } as User;
+            } else {
+              // Create basic user object if no Firestore document exists
+              this.currentUser = { 
+                uid: firebaseUser.uid, 
+                email: firebaseUser.email || '',
+                displayName: firebaseUser.displayName || '',
+                name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
+                surname: '',
+                role: 'user',
+                createdAt: new Date(),
+                updatedAt: new Date()
+              } as User;
+              
+              // Optionally create user document in Firestore
+              try {
+                await this.firestore.collection('users').doc(firebaseUser.uid).set(this.currentUser);
+                console.log('Created user document in Firestore');
+              } catch (error) {
+                console.warn('Failed to create user document:', error);
+              }
+            }
+            
+            console.log('Current user set:', this.currentUser);
+            
+            // Load loans for authenticated user
+            this.loadUserLoans();
+            
+          } catch (error) {
+            console.error('Error loading user data:', error);
+            this.currentUser = null;
+            this.presentToast('Error loading user data');
+          }
+        } else {
+          console.log('No authenticated user, redirecting to login');
+          this.currentUser = null;
+          this.loans = [];
+          
+          // Redirect to login page if no user is authenticated
+          this.router.navigate(['/login']);
+        }
+        
+        this.authLoading = false;
+        this.loading = false;
+        
+        // Trigger change detection
+        this.ngZone.run(() => {
+          this.cdr.detectChanges();
+        });
+        
+        return this.currentUser;
+      })
+    ).subscribe({
+      error: (error) => {
+        console.error('Auth state error:', error);
+        this.authLoading = false;
+        this.loading = false;
+        this.presentToast('Authentication error occurred');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadPaystackScript() {
@@ -75,6 +167,9 @@ export class MyLoansPage implements OnInit, OnDestroy {
         this.paystackScriptLoaded = true;
         console.log('Paystack script loaded');
       };
+      script.onerror = () => {
+        console.error('Failed to load Paystack script');
+      };
       document.body.appendChild(script);
     }
   }
@@ -85,36 +180,47 @@ export class MyLoansPage implements OnInit, OnDestroy {
     if (!this.currentUser) {
       console.log('No current user, cannot load loans');
       this.loans = [];
-      this.loading = false;
       return;
     }
 
-    // Simple observable subscription without complex mapping
+    // Clear existing loan subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions = [];
+
+    // Load loans with real-time updates
     const loansSubscription = this.firestore
       .collection('loans', ref => 
         ref.where('userId', '==', this.currentUser!.uid)
-          // Temporarily remove orderBy until index is created
-          // .orderBy('createdAt', 'desc')
       )
-      .valueChanges({ idField: 'id' }) // This automatically adds the document ID as 'id' field
+      .valueChanges({ idField: 'id' })
       .subscribe({
         next: (loans: any[]) => {
-          console.log('Loans loaded from Firestore:', loans);
-          // Sort in memory as a temporary solution
+          console.log('Loans loaded from Firestore:', loans.length);
+          
+          // Sort loans by creation date (newest first)
           const sortedLoans = (loans as Loan[]).sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dateB - dateA; // Descending order
+            return dateB - dateA;
           });
+          
           this.loans = sortedLoans;
-          this.loading = false;
-          console.log('Loans assigned to component:', this.loans);
+          console.log('Loans assigned to component:', this.loans.length);
+          
+          // Trigger change detection
+          this.ngZone.run(() => {
+            this.cdr.detectChanges();
+          });
         },
         error: (error) => {
           console.error('Error loading loans:', error);
           this.loans = [];
-          this.loading = false;
           this.presentToast('Failed to load loans. Please try again.');
+          
+          // Trigger change detection
+          this.ngZone.run(() => {
+            this.cdr.detectChanges();
+          });
         }
       });
 
@@ -125,77 +231,57 @@ export class MyLoansPage implements OnInit, OnDestroy {
   async refreshLoans(event: any) {
     console.log('Refreshing loans...');
     
-    this.loading = true;
-    
-    // Unsubscribe from existing subscriptions
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.subscriptions = [];
-    
-    // Reload user and loans
-    await this.loadCurrentUser();
-    
-    if (this.currentUser) {
-      this.loadUserLoans();
-    } else {
-      this.loading = false;
+    try {
+      // Check if user is still authenticated
+      const user = await this.afAuth.currentUser;
+      if (!user) {
+        console.log('User not authenticated during refresh');
+        this.router.navigate(['/login']);
+        return;
+      }
+      
+      // Reload loans
+      if (this.currentUser) {
+        this.loadUserLoans();
+      }
+      
+    } catch (error) {
+      console.error('Error during refresh:', error);
+      this.presentToast('Failed to refresh data');
+    } finally {
+      // Complete the refresh
+      setTimeout(() => {
+        event.target.complete();
+      }, 1000);
     }
-    
-    // Complete the refresh
-    setTimeout(() => {
-      event.target.complete();
-    }, 1000);
   }
 
-  // Alternative method using auth state observable for better reliability
-  async loadCurrentUser() {
+  /**
+   * Manual logout method
+   */
+  async logout() {
     try {
-      const user = await this.afAuth.currentUser;
-      
-      if (user) {
-        // Try to get additional user data from Firestore
-        try {
-          const userDoc = await this.firestore.collection('users').doc(user.uid).get().toPromise();
-          
-          if (userDoc && userDoc.exists) {
-            const userData = userDoc.data() || {};
-            this.currentUser = { uid: user.uid, ...userData } as User;
-          } else {
-            // Create basic user object if no Firestore document exists
-            this.currentUser = { 
-              uid: user.uid, 
-              email: user.email || '',
-              displayName: user.displayName || '',
-              name: user.displayName || '',
-              surname: '',
-              role: 'user',
-              createdAt: new Date(),
-              updatedAt: new Date()
-            } as User;
-          }
-        } catch (firestoreError) {
-          console.error('Error loading user data from Firestore:', firestoreError);
-          // Fallback to basic user object
-          this.currentUser = { 
-            uid: user.uid, 
-            email: user.email || '',
-            displayName: user.displayName || '',
-            name: user.displayName || '',
-            surname: '',
-            role: 'user',
-            createdAt: new Date(),
-            updatedAt: new Date()
-          } as User;
-        }
-        
-        console.log('Current user loaded:', this.currentUser);
-      } else {
-        this.currentUser = null;
-        console.log('No authenticated user found');
-      }
+      await this.afAuth.signOut();
+      console.log('User logged out successfully');
+      // The auth state listener will handle navigation
     } catch (error) {
-      console.error('Error loading current user:', error);
-      this.currentUser = null;
+      console.error('Logout error:', error);
+      this.presentToast('Error logging out');
     }
+  }
+
+  /**
+   * Check if the page is still loading authentication
+   */
+  get isAuthLoading(): boolean {
+    return this.authLoading;
+  }
+
+  /**
+   * Check if user is authenticated and data is loaded
+   */
+  get isUserAuthenticated(): boolean {
+    return !this.authLoading && this.currentUser !== null;
   }
 
   // Missing method: Get count of active loans
