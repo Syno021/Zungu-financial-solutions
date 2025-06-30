@@ -387,51 +387,6 @@ private readonly GRACE_PERIOD_DAYS = 0; // No grace period for 1-month terms
     return loan.id || index.toString();
   }
 
-  // Updated penalty calculation methods for 1-month loan terms
-
-/**
- * Calculate penalty amount based on overdue period - Updated for 1-month terms
- */
-calculatePenaltyAmount(loan: Loan): PenaltyCalculation {
-  const now = new Date();
-  const loanStartDate = loan.approvedAt ? new Date(loan.approvedAt) : new Date(loan.createdAt);
-  
-  // For 1-month terms, payment is due at the end of the month
-  const paymentDueDate = new Date(loanStartDate);
-  paymentDueDate.setMonth(paymentDueDate.getMonth() + (loan.term || 1));
-  
-  // Calculate days overdue from the due date
-  const daysOverdue = Math.max(0, Math.floor((now.getTime() - paymentDueDate.getTime()) / (1000 * 60 * 60 * 24)));
-  
-  // Apply penalty immediately after due date (no grace period for 1-month terms)
-  const penaltyPeriods = Math.max(0, Math.floor(daysOverdue / 30)); // Every 30 days after due date
-  
-  // Get current outstanding amount
-  const totalPaid = (loan.payments || [])
-    .filter(p => p.status === 'paid' && p.amount > 0) // Only positive payments (exclude penalties)
-    .reduce((sum, p) => sum + (p.amount || 0), 0);
-  
-  const originalAmount = loan.amount || 0;
-  const currentOutstanding = originalAmount - totalPaid;
-  
-  // Calculate compound penalty on outstanding amount
-  let penaltyAmount = 0;
-  if (penaltyPeriods > 0 && currentOutstanding > 0) {
-    const compoundAmount = currentOutstanding * Math.pow(1 + this.PENALTY_RATE, penaltyPeriods);
-    penaltyAmount = compoundAmount - currentOutstanding;
-  }
-
-  return {
-    baseAmount: currentOutstanding,
-    penaltyAmount: penaltyAmount,
-    totalAmount: currentOutstanding + penaltyAmount,
-    monthsOverdue: penaltyPeriods,
-    penaltyRate: this.PENALTY_RATE,
-    lastPaymentDate: this.getLastPaymentDate(loan),
-    nextDueDate: paymentDueDate
-  };
-}
-
 /**
  * Check if penalty has already been applied for current period - Updated
  */
@@ -453,33 +408,7 @@ private hasRecentPenaltyBeenApplied(loan: Loan, currentPenaltyPeriods: number): 
  */
 
 
-/**
- * Calculate monthly payment for 1-month terms
- */
-calculateMonthlyPayment(loan: Loan): number {
-  if (!loan || loan.status === 'completed') return 0;
-  
-  // For 1-month terms, the entire amount + interest is due in one payment
-  const totalAmount = (loan.amount || 0) * (1 + (loan.interestRate || 0) / 100);
-  const penaltyInfo = this.calculatePenaltyAmount(loan);
-  
-  return totalAmount + penaltyInfo.penaltyAmount;
-}
 
-/**
- * Check if loan is overdue - Updated for 1-month terms
- */
-isLoanOverdue(loan: Loan): boolean {
-  if (loan.status !== 'active') return false;
-  
-  const now = new Date();
-  const loanStartDate = loan.approvedAt ? new Date(loan.approvedAt) : new Date(loan.createdAt);
-  const dueDate = new Date(loanStartDate);
-  dueDate.setMonth(dueDate.getMonth() + (loan.term || 1));
-  
-  const remainingBalance = this.calculateRemainingBalance(loan);
-  return now > dueDate && remainingBalance > 0;
-}
 
 /**
  * Get days until next penalty application
@@ -502,22 +431,180 @@ getDaysUntilNextPenalty(loan: Loan): number {
 }
 
 
-  calculateRemainingBalance(loan: Loan): number {
-    if (!loan) return 0;
-    
-    const totalAmount = (loan.amount || 0) * (1 + ((loan.interestRate || 0) / 100 * (loan.term || 0) / 12));
-    const payments = loan.payments || [];
-    const totalPaid = payments.reduce((sum, payment) => 
-      payment.status === 'paid' ? sum + (payment.amount || 0) : sum, 0
-    );
-    
-    return Math.max(0, totalAmount - totalPaid);
+  /**
+ * Calculate the total amount due (principal + interest) for a loan
+ * Uses simple interest: Total = Principal × (1 + rate)
+ */
+calculateTotalDue(loan: Loan): number {
+  if (!loan) return 0;
+  
+  const principal = loan.amount || 0;
+  const interestRate = (loan.interestRate || 30) / 100; // Convert percentage to decimal
+  
+  // For 1-month terms, apply the full interest rate
+  const totalDue = principal * (1 + interestRate);
+  
+  return totalDue;
+}
+
+/**
+ * Calculate remaining balance after payments
+ */
+calculateRemainingBalance(loan: Loan): number {
+  if (!loan) return 0;
+  
+  const totalDue = this.calculateTotalDue(loan);
+  const payments = loan.payments || [];
+  
+  // Only count positive payments (actual payments, not penalties)
+  const totalPaid = payments
+    .filter(payment => payment.status === 'paid' && (payment.amount > 0))
+    .reduce((sum, payment) => sum + (payment.amount || 0), 0);
+  
+  return Math.max(0, totalDue - totalPaid);
+}
+
+/**
+ * Calculate monthly payment for 1-month terms
+ * For 1-month loans, the full amount + interest is due in one payment
+ */
+calculateMonthlyPayment(loan: Loan): number {
+  if (!loan || loan.status === 'completed') return 0;
+  
+  // For 1-month terms, return the remaining balance (which includes interest)
+  return this.calculateRemainingBalance(loan);
+}
+
+/**
+ * Calculate interest amount only
+ */
+calculateInterestAmount(loan: Loan): number {
+  if (!loan) return 0;
+  
+  const principal = loan.amount || 0;
+  const interestRate = (loan.interestRate || 30) / 100;
+  
+  return principal * interestRate;
+}
+
+/**
+ * Get loan due date
+ */
+getLoanDueDate(loan: Loan): Date {
+  const startDate = loan.approvedAt ? new Date(loan.approvedAt) : new Date(loan.createdAt);
+  const dueDate = new Date(startDate);
+  dueDate.setMonth(dueDate.getMonth() + (loan.term || 1));
+  
+  return dueDate;
+}
+
+/**
+ * Check if loan is overdue
+ */
+isLoanOverdue(loan: Loan): boolean {
+  if (loan.status !== 'active') return false;
+  
+  const now = new Date();
+  const dueDate = this.getLoanDueDate(loan);
+  const remainingBalance = this.calculateRemainingBalance(loan);
+  
+  return now > dueDate && remainingBalance > 0;
+}
+
+/**
+ * Updated penalty calculation - separate from interest calculation
+ * Only applies to overdue loans
+ */
+calculatePenaltyAmount(loan: Loan): PenaltyCalculation {
+  const now = new Date();
+  const dueDate = this.getLoanDueDate(loan);
+  
+  // Calculate days overdue
+  const daysOverdue = Math.max(0, Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
+  
+  // No penalty if not overdue
+  if (daysOverdue <= 0) {
+    return {
+      baseAmount: this.calculateRemainingBalance(loan),
+      penaltyAmount: 0,
+      totalAmount: this.calculateRemainingBalance(loan),
+      monthsOverdue: 0,
+      penaltyRate: this.PENALTY_RATE,
+      lastPaymentDate: this.getLastPaymentDate(loan),
+      nextDueDate: dueDate
+    };
+  }
+  
+  // Calculate penalty periods (every 30 days)
+  const penaltyPeriods = Math.floor(daysOverdue / 30);
+  
+  // Get current outstanding balance (already includes original interest)
+  const outstandingBalance = this.calculateRemainingBalance(loan);
+  
+  // Calculate compound penalty on outstanding amount
+  let penaltyAmount = 0;
+  if (penaltyPeriods > 0 && outstandingBalance > 0) {
+    // Apply compound penalty: Outstanding × (1 + penalty_rate)^periods - Outstanding
+    const compoundAmount = outstandingBalance * Math.pow(1 + this.PENALTY_RATE, penaltyPeriods);
+    penaltyAmount = compoundAmount - outstandingBalance;
   }
 
-  calculateTotalDue(loan: Loan): number {
-    if (!loan) return 0;
-    return (loan.amount || 0) * (1 + ((loan.interestRate || 0) / 100 * (loan.term || 0) / 12));
-  }
+  return {
+    baseAmount: outstandingBalance,
+    penaltyAmount: penaltyAmount,
+    totalAmount: outstandingBalance + penaltyAmount,
+    monthsOverdue: penaltyPeriods,
+    penaltyRate: this.PENALTY_RATE,
+    lastPaymentDate: this.getLastPaymentDate(loan),
+    nextDueDate: dueDate
+  };
+}
+
+/**
+ * Get total amount to pay (remaining balance + any penalties)
+ */
+getTotalAmountToPay(loan: Loan): number {
+  const remainingBalance = this.calculateRemainingBalance(loan);
+  const penaltyInfo = this.calculatePenaltyAmount(loan);
+  
+  return remainingBalance + penaltyInfo.penaltyAmount;
+}
+
+/**
+ * Get breakdown of loan amounts for display
+ */
+getLoanBreakdown(loan: Loan): {
+  principal: number;
+  interest: number;
+  totalDue: number;
+  paid: number;
+  remainingBalance: number;
+  penalties: number;
+  totalToPay: number;
+} {
+  const principal = loan.amount || 0;
+  const interest = this.calculateInterestAmount(loan);
+  const totalDue = this.calculateTotalDue(loan);
+  
+  const payments = loan.payments || [];
+  const paid = payments
+    .filter(payment => payment.status === 'paid' && payment.amount > 0)
+    .reduce((sum, payment) => sum + (payment.amount || 0), 0);
+  
+  const remainingBalance = Math.max(0, totalDue - paid);
+  const penaltyInfo = this.calculatePenaltyAmount(loan);
+  const totalToPay = remainingBalance + penaltyInfo.penaltyAmount;
+  
+  return {
+    principal,
+    interest,
+    totalDue,
+    paid,
+    remainingBalance,
+    penalties: penaltyInfo.penaltyAmount,
+    totalToPay
+  };
+}
 
   async showPaymentOptions(loan: Loan) {
     const remainingBalance = this.calculateRemainingBalance(loan);
